@@ -1,0 +1,17 @@
+{
+    "name": "weph/obsidian-tools",
+    "description": "Tools to operate on an obsidian vault",
+    "type": "project",
+    "autoload": {
+        "psr-4": {
+            "Weph\\ObsidianTools\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Philip Weinke",
+            "email": "hello@philip-weinke.de"
+        }
+    ],
+    "require": {}
+}
