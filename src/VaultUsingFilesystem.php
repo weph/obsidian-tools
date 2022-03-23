@@ -61,4 +61,30 @@ final class VaultUsingFilesystem implements Vault
 
         file_put_contents($this->path . '/' . $note->path, sprintf("---\n%s\n---\n%s", $frontMatter, $note->content));
     }
+
+    public function notesMatching(Query $query): array
+    {
+        $files = $this->finder->files()
+            ->in($this->path)
+            ->contains($query->contentRegex);
+
+        $result = [];
+        foreach ($files as $file) {
+            $note = $this->noteAt($file->getPathname());
+
+            preg_match_all($query->contentRegex, $note->content, $matches);
+
+            $realMatches = [];
+
+            foreach (array_slice($matches, 1) as $groupIndex => $match) {
+                foreach ($match as $index => $x) {
+                    $realMatches[$index][$groupIndex] = $x;
+                }
+            }
+
+            $result[] = new MatchedNote($note, $realMatches);
+        }
+
+        return $result;
+    }
 }

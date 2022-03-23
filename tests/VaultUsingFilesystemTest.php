@@ -11,6 +11,8 @@ use Weph\ObsidianTools\VaultUsingFilesystem;
  * @covers \Weph\ObsidianTools\VaultUsingFilesystem
  * @uses   \Weph\ObsidianTools\Note
  * @uses   \Weph\ObsidianTools\NoteNotFound
+ * @uses   \Weph\ObsidianTools\MatchedNote
+ * @uses   \Weph\ObsidianTools\Query
  */
 final class VaultUsingFilesystemTest extends VaultTest
 {

@@ -16,4 +16,9 @@ interface Vault
     public function get(string $location): Note;
 
     public function save(Note $note): void;
+
+    /**
+     * @return list<MatchedNote>
+     */
+    public function notesMatching(Query $query): array;
 }

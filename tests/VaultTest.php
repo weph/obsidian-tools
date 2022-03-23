@@ -3,8 +3,10 @@ declare(strict_types=1);
 
 namespace Tests\Weph\ObsidianTools;
 
+use Weph\ObsidianTools\MatchedNote;
 use Weph\ObsidianTools\Note;
 use Weph\ObsidianTools\NoteNotFound;
+use Weph\ObsidianTools\Query;
 use Weph\ObsidianTools\Vault;
 use PHPUnit\Framework\TestCase;
 
@@ -76,4 +78,75 @@ abstract class VaultTest extends TestCase
     }
 
     abstract protected function subject(): Vault;
+
+    /**
+     * @param list<Note> $notes
+     * @param list<MatchedNote> $expected
+     *
+     * @test
+     * @dataProvider matchingExamples
+     */
+    public function it_should_return_matching_notes(array $notes, Query $query, array $expected): void
+    {
+        $this->saveAll(...$notes);
+
+        $result = $this->subject()->notesMatching($query);
+
+        self::assertEquals($expected, $result);
+    }
+
+    public function matchingExamples(): iterable
+    {
+        $note1 = new Note('note1', [], 'foo:foo bar:foo');
+        $note2 = new Note('note2', [], 'foo:bar bar:bar');
+        $note3 = new Note('note3', [], 'foo:foo1 bar:bar1 foo:foo2 bar:bar2');
+        $notes = [$note1, $note2, $note3];
+
+        yield 'Without groups' => [
+            $notes,
+            new Query('/foo:foo/'),
+            [new MatchedNote($note1, []), new MatchedNote($note3, [])]
+        ];
+
+        yield 'Single group' => [
+            $notes,
+            new Query('/foo:([^\s]+)/'),
+            [
+                new MatchedNote($note1, [['foo']]),
+                new MatchedNote($note2, [['bar']]),
+                new MatchedNote($note3, [['foo1'], ['foo2']])
+            ]
+        ];
+
+        yield 'Multiple groups' => [
+            $notes,
+            new Query('/foo:([^\s]+) bar:([^\s]+)/'),
+            [
+                new MatchedNote($note1, [['foo', 'foo']]),
+                new MatchedNote($note2, [['bar', 'bar']]),
+                new MatchedNote($note3, [['foo1', 'bar1'], ['foo2', 'bar2']])
+            ]
+        ];
+
+        yield 'Named groups' => [
+            $notes,
+            new Query('/foo:(?P<foo>[^\s]+) bar:(?P<bar>[^\s]+)/'),
+            [
+                new MatchedNote(
+                    $note1,
+                    [[0 => 'foo', 1 => 'foo', 'foo' => 'foo', 'bar' => 'foo']]
+                ),
+                new MatchedNote(
+                    $note2,
+                    [[0 => 'bar', 1 => 'bar', 'foo' => 'bar', 'bar' => 'bar']]
+                ),
+                new MatchedNote($note3,
+                    [
+                        [0 => 'foo1', 1 => 'bar1', 'foo' => 'foo1', 'bar' => 'bar1'],
+                        [0 => 'foo2', 1 => 'bar2', 'foo' => 'foo2', 'bar' => 'bar2']
+                    ]
+                )
+            ]
+        ];
+    }
 }
