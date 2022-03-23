@@ -7,11 +7,30 @@
             "Weph\\ObsidianTools\\": "src/"
         }
     },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\Weph\\ObsidianTools\\": "tests/"
+        }
+    },
     "authors": [
         {
             "name": "Philip Weinke",
             "email": "hello@philip-weinke.de"
         }
     ],
-    "require": {}
+    "require-dev": {
+        "mikey179/vfsstream": "^1.6",
+        "phpunit/phpunit": "^9.5",
+        "vimeo/psalm": "^4.22",
+        "roave/infection-static-analysis-plugin": "^1.18"
+    },
+    "require": {
+        "ergebnis/front-matter": "^0.4.0",
+        "symfony/finder": "^6.0"
+    },
+    "config": {
+        "allow-plugins": {
+            "infection/extension-installer": true
+        }
+    }
 }
