@@ -9,6 +9,7 @@ use Weph\ObsidianTools\Vault\VaultUsingFilesystem;
 
 /**
  * @covers \Weph\ObsidianTools\Vault\VaultUsingFilesystem
+ *
  * @uses   \Weph\ObsidianTools\Vault\Note
  * @uses   \Weph\ObsidianTools\Vault\NoteNotFound
  * @uses   \Weph\ObsidianTools\Vault\MatchedNote
@@ -18,11 +19,6 @@ final class VaultUsingFilesystemTest extends VaultTest
 {
     private VaultUsingFilesystem $subject;
 
-    protected function subject(): Vault
-    {
-        return $this->subject;
-    }
-
     protected function setUp(): void
     {
         parent::setUp();
@@ -30,5 +26,10 @@ final class VaultUsingFilesystemTest extends VaultTest
         $root = vfsStream::setup();
 
         $this->subject = VaultUsingFilesystem::atPath($root->url());
+    }
+
+    protected function subject(): Vault
+    {
+        return $this->subject;
     }
 }

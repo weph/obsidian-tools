@@ -22,7 +22,8 @@
         "mikey179/vfsstream": "^1.6",
         "phpunit/phpunit": "^9.5",
         "vimeo/psalm": "^4.22",
-        "roave/infection-static-analysis-plugin": "^1.18"
+        "roave/infection-static-analysis-plugin": "^1.18",
+        "friendsofphp/php-cs-fixer": "^3.8"
     },
     "require": {
         "ergebnis/front-matter": "^0.4.0",

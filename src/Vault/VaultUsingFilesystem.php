@@ -34,16 +34,6 @@ final class VaultUsingFilesystem implements Vault
         return $result;
     }
 
-    private function noteAt(string $absolutePath): Note
-    {
-        $content = file_get_contents($absolutePath);
-
-        $location = substr($absolutePath, strlen($this->path) + 1);
-        $parsed = $this->frontMatterParser->parse($content);
-
-        return new Note($location, $parsed->frontMatter(), $parsed->content());
-    }
-
     public function get(string $location): Note
     {
         $absolutePath = $this->path . '/' . $location;
@@ -86,5 +76,15 @@ final class VaultUsingFilesystem implements Vault
         }
 
         return $result;
+    }
+
+    private function noteAt(string $absolutePath): Note
+    {
+        $content = file_get_contents($absolutePath);
+
+        $location = substr($absolutePath, strlen($this->path) + 1);
+        $parsed   = $this->frontMatterParser->parse($content);
+
+        return new Note($location, $parsed->frontMatter(), $parsed->content());
     }
 }

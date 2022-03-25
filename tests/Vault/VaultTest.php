@@ -47,7 +47,7 @@ abstract class VaultTest extends TestCase
      */
     public function save_should_overwrite_existing_note(): void
     {
-        $location = 'my-note';
+        $location     = 'my-note';
         $originalNote = new Note($location, ['tags' => ['a', 'b', 'c']], '# My Note');
         $this->subject()->save($originalNote);
 
@@ -69,15 +69,6 @@ abstract class VaultTest extends TestCase
 
         self::assertEquals([$note1, $note2, $note3], $this->subject()->all());
     }
-
-    private function saveAll(Note ...$notes): void
-    {
-        foreach ($notes as $note) {
-            $this->subject()->save($note);
-        }
-    }
-
-    abstract protected function subject(): Vault;
 
     /**
      * @param MatchedNote $notes
@@ -105,7 +96,7 @@ abstract class VaultTest extends TestCase
         yield 'Without groups' => [
             $notes,
             new Query('/foo:foo/'),
-            [new MatchedNote($note1, []), new MatchedNote($note3, [])]
+            [new MatchedNote($note1, []), new MatchedNote($note3, [])],
         ];
 
         yield 'Single group' => [
@@ -114,8 +105,8 @@ abstract class VaultTest extends TestCase
             [
                 new MatchedNote($note1, [['foo']]),
                 new MatchedNote($note2, [['bar']]),
-                new MatchedNote($note3, [['foo1'], ['foo2']])
-            ]
+                new MatchedNote($note3, [['foo1'], ['foo2']]),
+            ],
         ];
 
         yield 'Multiple groups' => [
@@ -124,8 +115,8 @@ abstract class VaultTest extends TestCase
             [
                 new MatchedNote($note1, [['foo', 'foo']]),
                 new MatchedNote($note2, [['bar', 'bar']]),
-                new MatchedNote($note3, [['foo1', 'bar1'], ['foo2', 'bar2']])
-            ]
+                new MatchedNote($note3, [['foo1', 'bar1'], ['foo2', 'bar2']]),
+            ],
         ];
 
         yield 'Named groups' => [
@@ -143,10 +134,19 @@ abstract class VaultTest extends TestCase
                 new MatchedNote($note3,
                     [
                         [0 => 'foo1', 1 => 'bar1', 'foo' => 'foo1', 'bar' => 'bar1'],
-                        [0 => 'foo2', 1 => 'bar2', 'foo' => 'foo2', 'bar' => 'bar2']
+                        [0 => 'foo2', 1 => 'bar2', 'foo' => 'foo2', 'bar' => 'bar2'],
                     ]
-                )
-            ]
+                ),
+            ],
         ];
+    }
+
+    abstract protected function subject(): Vault;
+
+    private function saveAll(Note ...$notes): void
+    {
+        foreach ($notes as $note) {
+            $this->subject()->save($note);
+        }
     }
 }

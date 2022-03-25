@@ -33,26 +33,26 @@ final class SwimItems
      */
     public function years(): array
     {
-        return array_values(array_unique(array_map(static fn(SwimItem $v) => (int)substr($v->date, 0, 4), $this->items)));
+        return array_values(array_unique(array_map(static fn (SwimItem $v) => (int)substr($v->date, 0, 4), $this->items)));
     }
 
     public function sortByDate(): void
     {
-        usort($this->items, static fn(SwimItem $a, SwimItem $b) => $a->date <=> $b->date);
+        usort($this->items, static fn (SwimItem $a, SwimItem $b) => $a->date <=> $b->date);
     }
 
-    function totalDistance(): int
+    public function totalDistance(): int
     {
-        return array_sum(array_map(static fn(SwimItem $v) => $v->distance, $this->items));
+        return array_sum(array_map(static fn (SwimItem $v) => $v->distance, $this->items));
     }
 
-    function filterDate(string $filter): self
+    public function filterDate(string $filter): self
     {
         return new self(
             array_values(
                 array_filter(
                     $this->items,
-                    static fn(SwimItem $item) => str_starts_with($item->date, $filter)
+                    static fn (SwimItem $item) => str_starts_with($item->date, $filter)
                 )
             )
         );
