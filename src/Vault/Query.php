@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Weph\ObsidianTools;
+namespace Weph\ObsidianTools\Vault;
 
 final class Query
 {

@@ -1,14 +1,14 @@
 <?php
 declare(strict_types=1);
 
-namespace Tests\Weph\ObsidianTools;
+namespace Tests\Weph\ObsidianTools\Vault;
 
-use Weph\ObsidianTools\MatchedNote;
-use Weph\ObsidianTools\Note;
-use Weph\ObsidianTools\NoteNotFound;
-use Weph\ObsidianTools\Query;
-use Weph\ObsidianTools\Vault;
 use PHPUnit\Framework\TestCase;
+use Weph\ObsidianTools\Vault\MatchedNote;
+use Weph\ObsidianTools\Vault\Note;
+use Weph\ObsidianTools\Vault\NoteNotFound;
+use Weph\ObsidianTools\Vault\Query;
+use Weph\ObsidianTools\Vault\Vault;
 
 abstract class VaultTest extends TestCase
 {
@@ -80,8 +80,8 @@ abstract class VaultTest extends TestCase
     abstract protected function subject(): Vault;
 
     /**
-     * @param list<Note> $notes
-     * @param list<MatchedNote> $expected
+     * @param MatchedNote $notes
+     * @param MatchedNote $expected
      *
      * @test
      * @dataProvider matchingExamples

@@ -1,18 +1,18 @@
 <?php
 declare(strict_types=1);
 
-namespace Tests\Weph\ObsidianTools;
+namespace Tests\Weph\ObsidianTools\Vault;
 
 use org\bovigo\vfs\vfsStream;
-use Weph\ObsidianTools\Vault;
-use Weph\ObsidianTools\VaultUsingFilesystem;
+use Weph\ObsidianTools\Vault\Vault;
+use Weph\ObsidianTools\Vault\VaultUsingFilesystem;
 
 /**
- * @covers \Weph\ObsidianTools\VaultUsingFilesystem
- * @uses   \Weph\ObsidianTools\Note
- * @uses   \Weph\ObsidianTools\NoteNotFound
- * @uses   \Weph\ObsidianTools\MatchedNote
- * @uses   \Weph\ObsidianTools\Query
+ * @covers \Weph\ObsidianTools\Vault\VaultUsingFilesystem
+ * @uses   \Weph\ObsidianTools\Vault\Note
+ * @uses   \Weph\ObsidianTools\Vault\NoteNotFound
+ * @uses   \Weph\ObsidianTools\Vault\MatchedNote
+ * @uses   \Weph\ObsidianTools\Vault\Query
  */
 final class VaultUsingFilesystemTest extends VaultTest
 {
