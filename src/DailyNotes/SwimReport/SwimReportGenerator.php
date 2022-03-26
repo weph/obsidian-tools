@@ -88,11 +88,7 @@ final class SwimReportGenerator
         $table = new Table(['Datum', 'Distanz', 'Zeit', 'Durchschnitt']);
 
         foreach ($items->items() as $item) {
-            if ($item->time !== null) {
-                $average = Duration::fromSeconds((int)round($item->time->inSeconds() / $item->distance * 100));
-            } else {
-                $average = null;
-            }
+            $average = $item->averageTime();
 
             $table->addRow(
                 [
