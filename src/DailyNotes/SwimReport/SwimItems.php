@@ -28,6 +28,11 @@ final class SwimItems
         $this->items[] = new SwimItem($date, $distance, $time);
     }
 
+    public function count(): int
+    {
+        return count($this->items);
+    }
+
     /**
      * @return list<int>
      */

@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Weph\ObsidianTools\DailyNotes\SwimReport;
 
 use DateTimeImmutable;
+use Weph\ObsidianTools\Markdown\Table;
 use Weph\ObsidianTools\Vault\Note;
 use Weph\ObsidianTools\Vault\Query;
 use Weph\ObsidianTools\Vault\Vault;
@@ -93,37 +94,57 @@ final class SwimReportGenerator
         return $items;
     }
 
-    private function table(SwimItems $items): string
+    private function activityTable(SwimItems $items): Table
     {
-        $lines = [
-            sprintf('| %-10s | %8s | %6s |', 'Datum', 'Distanz', 'Zeit'),
-            sprintf('|:%s|%s:|%s:|', str_repeat('-', 11), str_repeat('-', 9), str_repeat('-', 7)),
-        ];
+        $table = new Table(['Datum', 'Distanz', 'Zeit', 'Durchschnitt']);
 
         foreach ($items->items() as $item) {
-            $lines[] = sprintf('| %s | %8s | %6s |', $item->date, number_format($item->distance, 0, ',', '.'), $item->time === null ? '' : $this->secondsAsDuration($item->time));
+            $table->addRow(
+                [
+                    $item->date,
+                    number_format($item->distance, 0, ',', '.'),
+                    $item->time === null ? '' : $this->secondsAsDuration($item->time),
+                    '',
+                ]
+            );
         }
 
-        return implode("\n", $lines);
+        return $table;
     }
 
     private function contentForYear(int $year, SwimItems $items): string
     {
         $content = sprintf("# %s\n\n", $year);
-        $content .= sprintf("Insgesamt: %s\n\n", number_format($items->totalDistance()));
 
+        $content .= "## Übersicht\n";
+
+        $content .= sprintf("- Insgesamt: %s\n", number_format($items->totalDistance()));
+        $content .= sprintf("- Aktivitäten: %d\n", $items->count());
+
+        $monthlyOverview = new Table(['Monat', 'Distanz']);
         for ($month = 1; $month <= 12; ++$month) {
-            $date = DateTimeImmutable::createFromFormat('n', (string)$month);
-            assert($date instanceof DateTimeImmutable);
-            $monthName = $date->format('F');
+            $monthName = $this->monthName($month);
+            $distance  = number_format($items->filterDate(sprintf('%s-%02d', $year, $month))->totalDistance(), 0, ',', '.');
 
-            $content .= sprintf("- %s: %s\n", $monthName, number_format($items->filterDate(sprintf('%s-%02d', $year, $month))->totalDistance(), 0, ',', '.'));
+            $monthlyOverview->addRow([$monthName, $distance]);
         }
 
         $content .= "\n";
-        $content .= $this->table($items);
+        $content .= "## Monatsübersicht\n";
+        $content .= $monthlyOverview->render();
+        $content .= "\n";
+        $content .= "## Aktivitäten\n";
+        $content .= $this->activityTable($items)->render();
         $content .= "\n";
 
         return $content;
+    }
+
+    private function monthName(int $month): string
+    {
+        $date = DateTimeImmutable::createFromFormat('n', (string)$month);
+        assert($date instanceof DateTimeImmutable);
+
+        return $date->format('F');
     }
 }
