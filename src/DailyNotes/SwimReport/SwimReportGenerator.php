@@ -5,6 +5,7 @@ namespace Weph\ObsidianTools\DailyNotes\SwimReport;
 
 use DateTimeImmutable;
 use Weph\ObsidianTools\Markdown\Table;
+use Weph\ObsidianTools\Type\Duration;
 use Weph\ObsidianTools\Vault\Note;
 use Weph\ObsidianTools\Vault\Query;
 use Weph\ObsidianTools\Vault\Vault;
@@ -60,21 +61,9 @@ final class SwimReportGenerator
         $this->vault->save(new Note('UNSORTED/Schwimmen.md', ['tags' => ['generated']], $content));
     }
 
-    private function durationToSeconds(string $duration): int
-    {
-        [$minutes, $seconds] = explode(':', $duration);
-
-        return (int)$minutes * 60 + (int)$seconds;
-    }
-
-    private function secondsAsDuration(int $seconds): string
-    {
-        return sprintf('%02d:%02d', $seconds / 60, $seconds % 60);
-    }
-
     private function swimItems(): SwimItems
     {
-        $query = new Query('/Schwimmen::? (?P<distance>.+) Meter(?: in (?P<time>\d{2}:\d{2}))?/');
+        $query = new Query('/Schwimmen::? (?P<distance>.+) Meter(?: in (?P<time>(?:\d{1,2}:)?\d{2}:\d{2}))?/');
 
         $items = SwimItems::empty();
         foreach ($this->vault->notesMatching($query) as $match) {
@@ -84,7 +73,7 @@ final class SwimReportGenerator
                 $items->add(
                     $date,
                     (int)str_replace('.', '', $item['distance']),
-                    isset($item['time']) && $item['time'] !== '' ? $this->durationToSeconds($item['time']) : null
+                    isset($item['time']) && $item['time'] !== '' ? Duration::fromString($item['time']) : null
                 );
             }
         }
@@ -99,12 +88,18 @@ final class SwimReportGenerator
         $table = new Table(['Datum', 'Distanz', 'Zeit', 'Durchschnitt']);
 
         foreach ($items->items() as $item) {
+            if ($item->time !== null) {
+                $average = Duration::fromSeconds((int)round($item->time->inSeconds() / $item->distance * 100));
+            } else {
+                $average = null;
+            }
+
             $table->addRow(
                 [
-                    $item->date,
+                    sprintf('[[%s]]', $item->date),
                     number_format($item->distance, 0, ',', '.'),
-                    $item->time === null ? '' : $this->secondsAsDuration($item->time),
-                    '',
+                    $item->time === null ? '' : $item->time->asString(),
+                    $average === null ? '' : $average->asString(),
                 ]
             );
         }

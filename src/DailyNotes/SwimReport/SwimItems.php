@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace Weph\ObsidianTools\DailyNotes\SwimReport;
 
+use Weph\ObsidianTools\Type\Duration;
+
 final class SwimItems
 {
     /**
@@ -23,7 +25,7 @@ final class SwimItems
         return new self([]);
     }
 
-    public function add(string $date, int $distance, ?int $time): void
+    public function add(string $date, int $distance, ?Duration $time): void
     {
         $this->items[] = new SwimItem($date, $distance, $time);
     }
