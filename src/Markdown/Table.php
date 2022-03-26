@@ -20,7 +20,7 @@ final class Table
      */
     public function __construct(private readonly array $header)
     {
-        $this->columnWidths = array_map('\strlen', $this->header);
+        $this->columnWidths = array_map('\mb_strlen', $this->header);
     }
 
     /**
@@ -29,8 +29,8 @@ final class Table
     public function addRow(array $values): void
     {
         foreach ($values as $i => $value) {
-            if (strlen($value) > $this->columnWidths[$i]) {
-                $this->columnWidths[$i] = strlen($value);
+            if (mb_strlen($value) > $this->columnWidths[$i]) {
+                $this->columnWidths[$i] = mb_strlen($value);
             }
         }
 
@@ -58,7 +58,7 @@ final class Table
     {
         $paddedCells = [];
         foreach ($row as $index => $value) {
-            $paddedCells[] = str_pad($value, $this->columnWidths[$index], ' ', STR_PAD_RIGHT);
+            $paddedCells[] = $value . str_repeat(' ', $this->columnWidths[$index] - mb_strlen($value));
         }
 
         return sprintf('| %s |', implode(' | ', $paddedCells));

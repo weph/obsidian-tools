@@ -28,4 +28,20 @@ final class TableTest extends TestCase
             $table->render()
         );
     }
+
+    /**
+     * @test
+     */
+    public function column_width_should_be_determined_correctly_when_unicode_characters_are_present(): void
+    {
+        $table = new Table(['Cöl A', 'Col B']);
+        $table->addRow(['Value 1', 'Välue 2']);
+
+        self::assertSame(
+            "| Cöl A   | Col B   |\n" .
+            "| ------- | ------- |\n" .
+            "| Value 1 | Välue 2 |\n",
+            $table->render()
+        );
+    }
 }
