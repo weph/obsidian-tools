@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Tests\Weph\ObsidianTools\Vault;
 
 use PHPUnit\Framework\TestCase;
+use Weph\ObsidianTools\Vault\Asset;
 use Weph\ObsidianTools\Vault\MatchedNote;
 use Weph\ObsidianTools\Vault\Note;
 use Weph\ObsidianTools\Vault\NoteNotFound;
@@ -35,11 +36,11 @@ abstract class VaultTest extends TestCase
      */
     public function it_returns_a_saved_note(): void
     {
-        $note = new Note('my-note', ['tags' => ['a', 'b', 'c']], '# My Note');
+        $note = new Note('my-note.md', ['tags' => ['a', 'b', 'c']], '# My Note');
 
         $this->subject()->save($note);
 
-        self::assertEquals($note, $this->subject()->get('my-note'));
+        self::assertEquals($note, $this->subject()->get('my-note.md'));
     }
 
     /**
@@ -47,7 +48,7 @@ abstract class VaultTest extends TestCase
      */
     public function save_should_overwrite_existing_note(): void
     {
-        $location     = 'my-note';
+        $location     = 'my-note.md';
         $originalNote = new Note($location, ['tags' => ['a', 'b', 'c']], '# My Note');
         $this->subject()->save($originalNote);
 
@@ -60,14 +61,16 @@ abstract class VaultTest extends TestCase
     /**
      * @test
      */
-    public function it_returns_all_saved_notes(): void
+    public function it_returns_all_saved_notes_and_assets(): void
     {
-        $note1 = new Note('my-note1', ['tags' => ['a']], '# My Note 1');
-        $note2 = new Note('my-note2', ['tags' => ['b']], '# My Note 2');
-        $note3 = new Note('my-note3', ['tags' => ['c']], '# My Note 3');
-        $this->saveAll($note1, $note2, $note3);
+        $note1  = new Note('my-note1.md', ['tags' => ['a']], '# My Note 1');
+        $note2  = new Note('my-note2.md', ['tags' => ['b']], '# My Note 2');
+        $note3  = new Note('my-note3.md', ['tags' => ['c']], '# My Note 3');
+        $asset1 = new Asset('my-asset-1', 'Asset Data 1');
+        $asset2 = new Asset('my-asset-2', 'Asset Data 2');
+        $this->saveAll($note1, $note2, $note3, $asset1, $asset2);
 
-        self::assertEquals([$note1, $note2, $note3], $this->subject()->all());
+        self::assertEquals([$note1, $note2, $note3, $asset1, $asset2], $this->subject()->all());
     }
 
     /**
@@ -88,9 +91,9 @@ abstract class VaultTest extends TestCase
 
     public function matchingExamples(): iterable
     {
-        $note1 = new Note('note1', [], 'foo:foo bar:foo');
-        $note2 = new Note('note2', [], 'foo:bar bar:bar');
-        $note3 = new Note('note3', [], 'foo:foo1 bar:bar1 foo:foo2 bar:bar2');
+        $note1 = new Note('note1.md', [], 'foo:foo bar:foo');
+        $note2 = new Note('note2.md', [], 'foo:bar bar:bar');
+        $note3 = new Note('note3.md', [], 'foo:foo1 bar:bar1 foo:foo2 bar:bar2');
         $notes = [$note1, $note2, $note3];
 
         yield 'Without groups' => [
@@ -139,11 +142,17 @@ abstract class VaultTest extends TestCase
                 ),
             ],
         ];
+
+        yield 'Assets should not match' => [
+            [$note1, new Asset('asset', 'foo:foo bar:foo')],
+            new Query('/foo:foo/'),
+            [new MatchedNote($note1, [])],
+        ];
     }
 
     abstract protected function subject(): Vault;
 
-    private function saveAll(Note ...$notes): void
+    private function saveAll(Note|Asset ...$notes): void
     {
         foreach ($notes as $note) {
             $this->subject()->save($note);

@@ -6,16 +6,16 @@ namespace Weph\ObsidianTools\Vault;
 interface Vault
 {
     /**
-     * @return list<Note>
+     * @return list<Note|Asset>
      */
     public function all(): array;
 
     /**
      * @throws NoteNotFound
      */
-    public function get(string $location): Note;
+    public function get(string $location): Note|Asset;
 
-    public function save(Note $note): void;
+    public function save(Note|Asset $note): void;
 
     /**
      * @return list<MatchedNote>

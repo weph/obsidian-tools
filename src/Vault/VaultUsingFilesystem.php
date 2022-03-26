@@ -34,7 +34,7 @@ final class VaultUsingFilesystem implements Vault
         return $result;
     }
 
-    public function get(string $location): Note
+    public function get(string $location): Note|Asset
     {
         $absolutePath = $this->path . '/' . $location;
 
@@ -45,8 +45,14 @@ final class VaultUsingFilesystem implements Vault
         return $this->noteAt($absolutePath);
     }
 
-    public function save(Note $note): void
+    public function save(Note|Asset $note): void
     {
+        if ($note instanceof Asset) {
+            file_put_contents($this->path . '/' . $note->path, $note->content);
+
+            return;
+        }
+
         $frontMatter = Yaml::dump($note->frontMatter);
 
         file_put_contents($this->path . '/' . $note->path, sprintf("---\n%s\n---\n%s", $frontMatter, $note->content));
@@ -61,6 +67,10 @@ final class VaultUsingFilesystem implements Vault
         $result = [];
         foreach ($files as $file) {
             $note = $this->noteAt($file->getPathname());
+
+            if ($note instanceof Asset) {
+                continue;
+            }
 
             preg_match_all($query->contentRegex, $note->content, $matches);
 
@@ -78,12 +88,16 @@ final class VaultUsingFilesystem implements Vault
         return $result;
     }
 
-    private function noteAt(string $absolutePath): Note
+    private function noteAt(string $absolutePath): Note|Asset
     {
-        $content = file_get_contents($absolutePath);
-
         $location = substr($absolutePath, strlen($this->path) + 1);
-        $parsed   = $this->frontMatterParser->parse($content);
+        $content  = file_get_contents($absolutePath);
+
+        if (!str_ends_with($absolutePath, '.md')) {
+            return new Asset($location, $content);
+        }
+
+        $parsed = $this->frontMatterParser->parse($content);
 
         return new Note($location, $parsed->frontMatter(), $parsed->content());
     }
