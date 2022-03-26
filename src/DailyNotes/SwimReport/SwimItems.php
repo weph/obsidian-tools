@@ -65,6 +65,18 @@ final class SwimItems
         );
     }
 
+    public function onlyWithTime(): self
+    {
+        return new self(
+            array_values(
+                array_filter(
+                    $this->items,
+                    static fn (SwimItem $item) => $item->time !== null
+                )
+            )
+        );
+    }
+
     /**
      * @return list<SwimItem>
      */

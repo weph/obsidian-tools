@@ -28,7 +28,8 @@
     },
     "require": {
         "ergebnis/front-matter": "^0.4.0",
-        "symfony/finder": "^6.0"
+        "symfony/finder": "^6.0",
+        "amenadiel/jpgraph": "^4.1"
     },
     "config": {
         "allow-plugins": {

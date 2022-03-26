@@ -6,6 +6,7 @@ namespace Weph\ObsidianTools\DailyNotes\SwimReport;
 use DateTimeImmutable;
 use Weph\ObsidianTools\Markdown\Table;
 use Weph\ObsidianTools\Type\Duration;
+use Weph\ObsidianTools\Vault\Asset;
 use Weph\ObsidianTools\Vault\Note;
 use Weph\ObsidianTools\Vault\Query;
 use Weph\ObsidianTools\Vault\Vault;
@@ -14,9 +15,12 @@ final class SwimReportGenerator
 {
     private Vault $vault;
 
+    private AverageTimeChartGenerator $averageTimeChartGenerator;
+
     public function __construct(Vault $vault)
     {
-        $this->vault = $vault;
+        $this->vault                     = $vault;
+        $this->averageTimeChartGenerator = new AverageTimeChartGenerator();
     }
 
     public function run(): void
@@ -118,6 +122,18 @@ final class SwimReportGenerator
             $distance  = number_format($items->filterDate(sprintf('%s-%02d', $year, $month))->totalDistance(), 0, ',', '.');
 
             $monthlyOverview->addRow([$monthName, $distance]);
+        }
+
+        $chartItems = $items->filterDate((string)$year)->onlyWithTime();
+        if ($chartItems->count() > 0) {
+            $chartFilename = sprintf('UNSORTED/Schwimmen-%s.generated.png', $year);
+            $chartContent  = $this->averageTimeChartGenerator->generate($chartItems);
+
+            $this->vault->save(new Asset($chartFilename, $chartContent));
+
+            $content .= "\n";
+            $content .= "## Durchschnittliche Zeit pro 100m\n";
+            $content .= sprintf('![[%s]]', $chartFilename);
         }
 
         $content .= "\n";
