@@ -58,8 +58,28 @@ final class SwimReportGenerator
 
         $content = "# Schwimmen\n\n";
 
+        $overviewTable = new Table(['Jahr', 'Distanz', 'Aktivitäten']);
+
         foreach ($years as $year) {
-            $content .= sprintf("- [[Schwimmen (%s)|%s]]: %s\n", $year, $year, number_format($items->filterDate((string)$year)->totalDistance()));
+            $overviewTable->addRow([
+                sprintf('[[Schwimmen (%s)\|%s]]', $year, $year),
+                number_format($items->filterDate((string)$year)->totalDistance(), 0, ',', '.'),
+                (string)$items->filterDate((string)$year)->count(),
+            ]);
+        }
+
+        $content .= $overviewTable->render();
+
+        $chartItems = $items->onlyWithTime();
+        if ($chartItems->count() > 0) {
+            $chartFilename = 'UNSORTED/Schwimmen.generated.png';
+            $chartContent  = $this->averageTimeChartGenerator->generate($chartItems);
+
+            $this->vault->save(new Asset($chartFilename, $chartContent));
+
+            $content .= "\n";
+            $content .= "## Durchschnittliche Zeit pro 100m\n";
+            $content .= sprintf('![[%s]]', $chartFilename);
         }
 
         $this->vault->save(new Note('UNSORTED/Schwimmen.md', ['tags' => ['generated']], $content));
