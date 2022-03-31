@@ -21,6 +21,9 @@ final class DurationTest extends TestCase
         self::assertEquals($input, Duration::fromString($input)->asString());
     }
 
+    /**
+     * @return iterable<array-key, array{0: string}>
+     */
     public function validStrings(): iterable
     {
         yield ['00:00'];
@@ -40,6 +43,9 @@ final class DurationTest extends TestCase
         self::assertEquals($expected, Duration::fromSeconds($input)->asString());
     }
 
+    /**
+     * @return iterable<array-key, array{0: int, 1: string}>
+     */
     public function validSeconds(): iterable
     {
         yield [0, '00:00'];

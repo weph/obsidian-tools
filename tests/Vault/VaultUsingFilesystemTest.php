@@ -10,6 +10,7 @@ use Weph\ObsidianTools\Vault\VaultUsingFilesystem;
 /**
  * @covers \Weph\ObsidianTools\Vault\VaultUsingFilesystem
  *
+ * @uses   \Weph\ObsidianTools\Vault\Asset
  * @uses   \Weph\ObsidianTools\Vault\Note
  * @uses   \Weph\ObsidianTools\Vault\NoteNotFound
  * @uses   \Weph\ObsidianTools\Vault\MatchedNote

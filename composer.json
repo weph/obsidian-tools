@@ -24,7 +24,8 @@
         "vimeo/psalm": "^4.22",
         "roave/infection-static-analysis-plugin": "^1.18",
         "friendsofphp/php-cs-fixer": "^3.8",
-        "captainhook/captainhook": "^5.10"
+        "captainhook/captainhook": "^5.10",
+        "psalm/plugin-phpunit": "^0.16.1"
     },
     "require": {
         "ergebnis/front-matter": "^0.4.0",

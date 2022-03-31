@@ -86,8 +86,8 @@ abstract class VaultTest extends TestCase
     }
 
     /**
-     * @param MatchedNote $notes
-     * @param MatchedNote $expected
+     * @param list<Note|Asset>  $notes
+     * @param list<MatchedNote> $expected
      *
      * @test
      *
@@ -103,6 +103,9 @@ abstract class VaultTest extends TestCase
         self::assertEquals($expected, $result);
     }
 
+    /**
+     * @return iterable<string, array{0: list<Note>, 1: Query, 2: list<MatchedNote>}>
+     */
     public function locationQueryExamples(): iterable
     {
         $rootNote   = new Note('note.md', [], '');
@@ -148,6 +151,9 @@ abstract class VaultTest extends TestCase
         ];
     }
 
+    /**
+     * @return iterable<string, array{0: list<Note|Asset>, 1: Query, 2: list<MatchedNote>}>
+     */
     public function matchingExamples(): iterable
     {
         $note1 = new Note('note1.md', [], 'foo:foo bar:foo');
@@ -203,9 +209,9 @@ abstract class VaultTest extends TestCase
         ];
 
         yield 'Assets should not match' => [
-            [$note1, new Asset('asset', 'foo:foo bar:foo')],
+            [$note1, new Asset('asset', 'foo:foo bar:foo'), $note3],
             Query::create()->withContent('/foo:foo/'),
-            [new MatchedNote($note1, [])],
+            [new MatchedNote($note1, []), new MatchedNote($note3, [])],
         ];
     }
 
