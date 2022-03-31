@@ -92,6 +92,7 @@ abstract class VaultTest extends TestCase
      * @test
      *
      * @dataProvider locationQueryExamples
+     * @dataProvider filenameQueryExamples
      * @dataProvider matchingExamples
      */
     public function it_should_return_matching_notes(array $notes, Query $query, array $expected): void
@@ -148,6 +149,36 @@ abstract class VaultTest extends TestCase
             $notes,
             Query::create()->withLocation('|foo/b+|'),
             [new MatchedNote($fooBarNote, []), new MatchedNote($fooBooNote, [])],
+        ];
+    }
+
+    /**
+     * @return iterable<string, array{0: list<Note>, 1: Query, 2: list<MatchedNote>}>
+     */
+    public function filenameQueryExamples(): iterable
+    {
+        $foo       = new Note('foo.md', [], '');
+        $foobar    = new Note('foobar.md', [], '');
+        $barFoo    = new Note('bar/foo.md', [], '');
+        $barBarfoo = new Note('bar/barfoo.md', [], '');
+        $notes     = [$foo, $foobar, $barFoo, $barBarfoo];
+
+        yield 'Match exact name' => [
+            $notes,
+            Query::create()->withFilename('foo.md'),
+            [
+                new MatchedNote($foo, []),
+                new MatchedNote($barFoo, []),
+            ],
+        ];
+
+        yield 'Match regex' => [
+            $notes,
+            Query::create()->withFilename('/(foobar|barfoo).md/'),
+            [
+                new MatchedNote($foobar, []),
+                new MatchedNote($barBarfoo, []),
+            ],
         ];
     }
 

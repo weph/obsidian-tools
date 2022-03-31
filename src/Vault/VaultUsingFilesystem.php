@@ -68,7 +68,8 @@ final class VaultUsingFilesystem implements Vault
         $files = $this->finder
             ->files()
             ->in($this->path)
-            ->path($query->location() ?? []);
+            ->path($query->location() ?? [])
+            ->name($query->filename() ?? []);
 
         $contentRegex = $query->content();
         if ($contentRegex !== null) {

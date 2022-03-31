@@ -3,11 +3,16 @@ declare(strict_types=1);
 
 namespace Weph\ObsidianTools\Vault;
 
+/**
+ * @psalm-immutable
+ */
 final class Query
 {
     private ?string $content = null;
 
     private ?string $location = null;
+
+    private ?string $filename = null;
 
     private function __construct()
     {
@@ -44,5 +49,19 @@ final class Query
     public function location(): ?string
     {
         return $this->location;
+    }
+
+    public function withFilename(?string $filenameRegex): self
+    {
+        $clone = clone $this;
+
+        $clone->filename = $filenameRegex;
+
+        return $clone;
+    }
+
+    public function filename(): ?string
+    {
+        return $this->filename;
     }
 }
