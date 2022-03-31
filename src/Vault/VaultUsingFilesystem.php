@@ -66,8 +66,12 @@ final class VaultUsingFilesystem implements Vault
     public function notesMatching(Query $query): array
     {
         $files = $this->finder->files()
-            ->in($this->path)
-            ->contains($query->contentRegex);
+            ->in($this->path);
+
+        $contentRegex = $query->content();
+        if ($contentRegex !== null) {
+            $files->contains($contentRegex);
+        }
 
         $result = [];
         foreach ($files as $file) {
@@ -77,13 +81,14 @@ final class VaultUsingFilesystem implements Vault
                 continue;
             }
 
-            preg_match_all($query->contentRegex, $note->content, $matches);
-
             $realMatches = [];
 
-            foreach (array_slice($matches, 1) as $groupIndex => $match) {
-                foreach ($match as $index => $x) {
-                    $realMatches[$index][$groupIndex] = $x;
+            if ($contentRegex !== null) {
+                preg_match_all($contentRegex, $note->content, $matches);
+                foreach (array_slice($matches, 1) as $groupIndex => $match) {
+                    foreach ($match as $index => $x) {
+                        $realMatches[$index][$groupIndex] = $x;
+                    }
                 }
             }
 

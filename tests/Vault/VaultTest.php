@@ -90,6 +90,8 @@ abstract class VaultTest extends TestCase
      * @param MatchedNote $expected
      *
      * @test
+     *
+     * @dataProvider emptyQueryExamples
      * @dataProvider matchingExamples
      */
     public function it_should_return_matching_notes(array $notes, Query $query, array $expected): void
@@ -101,6 +103,20 @@ abstract class VaultTest extends TestCase
         self::assertEquals($expected, $result);
     }
 
+    public function emptyQueryExamples(): iterable
+    {
+        $note1 = new Note('note1.md', [], '');
+        $note2 = new Note('some/folder/note2.md', [], '');
+        $note3 = new Note('some/other/folder/note3.md', [], '');
+        $notes = [$note1, $note2, $note3];
+
+        yield 'Empty query should match all notes' => [
+            $notes,
+            Query::create(),
+            [new MatchedNote($note1, []), new MatchedNote($note2, []), new MatchedNote($note3, [])],
+        ];
+    }
+
     public function matchingExamples(): iterable
     {
         $note1 = new Note('note1.md', [], 'foo:foo bar:foo');
@@ -110,13 +126,13 @@ abstract class VaultTest extends TestCase
 
         yield 'Without groups' => [
             $notes,
-            new Query('/foo:foo/'),
+            Query::create()->withContent('/foo:foo/'),
             [new MatchedNote($note1, []), new MatchedNote($note3, [])],
         ];
 
         yield 'Single group' => [
             $notes,
-            new Query('/foo:([^\s]+)/'),
+            Query::create()->withContent('/foo:([^\s]+)/'),
             [
                 new MatchedNote($note1, [['foo']]),
                 new MatchedNote($note2, [['bar']]),
@@ -126,7 +142,7 @@ abstract class VaultTest extends TestCase
 
         yield 'Multiple groups' => [
             $notes,
-            new Query('/foo:([^\s]+) bar:([^\s]+)/'),
+            Query::create()->withContent('/foo:([^\s]+) bar:([^\s]+)/'),
             [
                 new MatchedNote($note1, [['foo', 'foo']]),
                 new MatchedNote($note2, [['bar', 'bar']]),
@@ -136,7 +152,7 @@ abstract class VaultTest extends TestCase
 
         yield 'Named groups' => [
             $notes,
-            new Query('/foo:(?P<foo>[^\s]+) bar:(?P<bar>[^\s]+)/'),
+            Query::create()->withContent('/foo:(?P<foo>[^\s]+) bar:(?P<bar>[^\s]+)/'),
             [
                 new MatchedNote(
                     $note1,
@@ -157,7 +173,7 @@ abstract class VaultTest extends TestCase
 
         yield 'Assets should not match' => [
             [$note1, new Asset('asset', 'foo:foo bar:foo')],
-            new Query('/foo:foo/'),
+            Query::create()->withContent('/foo:foo/'),
             [new MatchedNote($note1, [])],
         ];
     }
