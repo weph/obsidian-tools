@@ -47,15 +47,20 @@ final class VaultUsingFilesystem implements Vault
 
     public function save(Note|Asset $note): void
     {
+        $absolutePath = $this->path . '/' . $note->path;
+        $directory    = dirname($absolutePath);
+
+        if (!file_exists($directory)) {
+            mkdir($directory, 0777, true);
+        }
+
         if ($note instanceof Asset) {
-            file_put_contents($this->path . '/' . $note->path, $note->content);
+            file_put_contents($absolutePath, $note->content);
 
             return;
         }
 
-        $frontMatter = Yaml::dump($note->frontMatter);
-
-        file_put_contents($this->path . '/' . $note->path, sprintf("---\n%s\n---\n%s", $frontMatter, $note->content));
+        file_put_contents($absolutePath, $this->noteContent($note));
     }
 
     public function notesMatching(Query $query): array
@@ -86,6 +91,17 @@ final class VaultUsingFilesystem implements Vault
         }
 
         return $result;
+    }
+
+    private function noteContent(Note $note): string
+    {
+        if ($note->frontMatter === []) {
+            return $note->content;
+        }
+
+        $frontMatter = Yaml::dump($note->frontMatter, 1);
+
+        return sprintf("---\n%s---\n%s", $frontMatter, $note->content);
     }
 
     private function noteAt(string $absolutePath): Note|Asset

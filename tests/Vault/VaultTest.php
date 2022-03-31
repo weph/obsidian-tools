@@ -46,6 +46,18 @@ abstract class VaultTest extends TestCase
     /**
      * @test
      */
+    public function a_note_can_be_stored_in_a_nested_structure(): void
+    {
+        $note = new Note('path/to/my-note.md', ['tags' => ['a', 'b', 'c']], '# My Note');
+
+        $this->subject()->save($note);
+
+        self::assertEquals($note, $this->subject()->get('path/to/my-note.md'));
+    }
+
+    /**
+     * @test
+     */
     public function save_should_overwrite_existing_note(): void
     {
         $location     = 'my-note.md';
