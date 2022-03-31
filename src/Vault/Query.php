@@ -7,6 +7,8 @@ final class Query
 {
     private ?string $content = null;
 
+    private ?string $location = null;
+
     private function __construct()
     {
     }
@@ -28,5 +30,19 @@ final class Query
     public function content(): ?string
     {
         return $this->content;
+    }
+
+    public function withLocation(?string $locationRegex): self
+    {
+        $clone = clone $this;
+
+        $clone->location = $locationRegex;
+
+        return $clone;
+    }
+
+    public function location(): ?string
+    {
+        return $this->location;
     }
 }

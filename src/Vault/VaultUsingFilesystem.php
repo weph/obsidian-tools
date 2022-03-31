@@ -65,8 +65,10 @@ final class VaultUsingFilesystem implements Vault
 
     public function notesMatching(Query $query): array
     {
-        $files = $this->finder->files()
-            ->in($this->path);
+        $files = $this->finder
+            ->files()
+            ->in($this->path)
+            ->path($query->location() ?? []);
 
         $contentRegex = $query->content();
         if ($contentRegex !== null) {

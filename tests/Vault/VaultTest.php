@@ -91,7 +91,7 @@ abstract class VaultTest extends TestCase
      *
      * @test
      *
-     * @dataProvider emptyQueryExamples
+     * @dataProvider locationQueryExamples
      * @dataProvider matchingExamples
      */
     public function it_should_return_matching_notes(array $notes, Query $query, array $expected): void
@@ -103,17 +103,48 @@ abstract class VaultTest extends TestCase
         self::assertEquals($expected, $result);
     }
 
-    public function emptyQueryExamples(): iterable
+    public function locationQueryExamples(): iterable
     {
-        $note1 = new Note('note1.md', [], '');
-        $note2 = new Note('some/folder/note2.md', [], '');
-        $note3 = new Note('some/other/folder/note3.md', [], '');
-        $notes = [$note1, $note2, $note3];
+        $rootNote   = new Note('note.md', [], '');
+        $fooNote1   = new Note('foo/note.md', [], '');
+        $fooFooNote = new Note('foo/foo/note.md', [], '');
+        $fooBarNote = new Note('foo/bar/note.md', [], '');
+        $fooBooNote = new Note('foo/boo/note.md', [], '');
+        $notes      = [$rootNote, $fooNote1, $fooFooNote, $fooBarNote, $fooBooNote];
 
-        yield 'Empty query should match all notes' => [
+        yield 'No location matches everything' => [
             $notes,
             Query::create(),
-            [new MatchedNote($note1, []), new MatchedNote($note2, []), new MatchedNote($note3, [])],
+            [
+                new MatchedNote($rootNote, []),
+                new MatchedNote($fooNote1, []),
+                new MatchedNote($fooFooNote, []),
+                new MatchedNote($fooBarNote, []),
+                new MatchedNote($fooBooNote, []),
+            ],
+        ];
+
+        yield 'Notes in location with subdirectory' => [
+            $notes,
+            Query::create()->withLocation('foo'),
+            [
+                new MatchedNote($fooNote1, []),
+                new MatchedNote($fooFooNote, []),
+                new MatchedNote($fooBarNote, []),
+                new MatchedNote($fooBooNote, []),
+            ],
+        ];
+
+        yield 'Notes in nested subdirectory' => [
+            $notes,
+            Query::create()->withLocation('foo/bar'),
+            [new MatchedNote($fooBarNote, [])],
+        ];
+
+        yield 'Regex can be used' => [
+            $notes,
+            Query::create()->withLocation('|foo/b+|'),
+            [new MatchedNote($fooBarNote, []), new MatchedNote($fooBooNote, [])],
         ];
     }
 
