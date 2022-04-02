@@ -11,4 +11,9 @@ final class Note
         public readonly string $content)
     {
     }
+
+    public function withFrontMatterField(string $field, mixed $value): self
+    {
+        return new self($this->path, array_merge($this->frontMatter, [$field => $value]), $this->content);
+    }
 }
