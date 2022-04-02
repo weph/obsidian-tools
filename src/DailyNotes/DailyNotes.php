@@ -98,9 +98,9 @@ final class DailyNotes
 
     public function previousMonth(int $year, int $month): ?string
     {
-        $month = sprintf('%04d-%02d', $year, $month);
+        $date = sprintf('%04d-%02d', $year, $month);
 
-        $pos = array_search($month, $this->months);
+        $pos = array_search($date, $this->months);
         if ($pos === false || $pos === 0) {
             return null;
         }
@@ -110,13 +110,39 @@ final class DailyNotes
 
     public function nextMonth(int $year, int $month): ?string
     {
-        $month = sprintf('%04d-%02d', $year, $month);
+        $date = sprintf('%04d-%02d', $year, $month);
 
-        $pos = array_search($month, $this->months);
+        $pos = array_search($date, $this->months);
         if ($pos === false || $pos >= count($this->months) - 1) {
             return null;
         }
 
         return $this->months[$pos + 1];
+    }
+
+    public function previousDay(int $year, int $month, int $day): ?string
+    {
+        $date = sprintf('%04d-%02d-%02d', $year, $month, $day);
+        $days = array_keys($this->notes);
+
+        $pos = array_search($date, $days);
+        if ($pos === false || $pos === 0) {
+            return null;
+        }
+
+        return $days[$pos - 1];
+    }
+
+    public function nextDay(int $year, int $month, int $day): ?string
+    {
+        $date = sprintf('%04d-%02d-%02d', $year, $month, $day);
+        $days = array_keys($this->notes);
+
+        $pos = array_search($date, $days);
+        if ($pos === false || $pos >= count($days) - 1) {
+            return null;
+        }
+
+        return $days[$pos + 1];
     }
 }

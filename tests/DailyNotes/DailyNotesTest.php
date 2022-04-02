@@ -116,4 +116,44 @@ final class DailyNotesTest extends TestCase
 
         self::assertSame($expected, $result);
     }
+
+    /**
+     * @test
+     *
+     * @testWith [2017, 1, 1, "2016-12-31"]
+     *           [2016, 12, 31, "2016-11-02"]
+     *           [2016, 11, 2, "2016-11-01"]
+     *           [2016, 11, 1, null]
+     */
+    public function it_should_return_the_previous_day(int $year, int $month, int $day, ?string $expected): void
+    {
+        $this->vault->save(new Note('Daily Notes/2017-01-01.md', [], ''));
+        $this->vault->save(new Note('Daily Notes/2016-12-31.md', [], ''));
+        $this->vault->save(new Note('Daily Notes/2016-11-02.md', [], ''));
+        $this->vault->save(new Note('Daily Notes/2016-11-01.md', [], ''));
+
+        $result = (new DailyNotes($this->vault))->previousDay($year, $month, $day);
+
+        self::assertSame($expected, $result);
+    }
+
+    /**
+     * @test
+     *
+     * @testWith [2017, 1, 1, null]
+     *           [2016, 12, 31, "2017-01-01"]
+     *           [2016, 11, 2, "2016-12-31"]
+     *           [2016, 11, 1, "2016-11-02"]
+     */
+    public function it_should_return_the_next_day(int $year, int $month, int $day, ?string $expected): void
+    {
+        $this->vault->save(new Note('Daily Notes/2017-01-01.md', [], ''));
+        $this->vault->save(new Note('Daily Notes/2016-12-31.md', [], ''));
+        $this->vault->save(new Note('Daily Notes/2016-11-02.md', [], ''));
+        $this->vault->save(new Note('Daily Notes/2016-11-01.md', [], ''));
+
+        $result = (new DailyNotes($this->vault))->nextDay($year, $month, $day);
+
+        self::assertSame($expected, $result);
+    }
 }
