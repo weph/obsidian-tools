@@ -57,6 +57,14 @@ final class DailyNotes
     }
 
     /**
+     * @return list<Note>
+     */
+    public function all(): array
+    {
+        return array_values($this->notes);
+    }
+
+    /**
      * @return list<int>
      */
     public function years(): array
