@@ -10,21 +10,18 @@ use Symfony\Component\Yaml\Yaml;
 
 final class VaultUsingFilesystem implements Vault
 {
-    public function __construct(
-        private readonly string $path,
-        private readonly Parser $frontMatterParser,
-        private readonly Finder $finder)
+    public function __construct(private readonly string $path, private readonly Parser $frontMatterParser)
     {
     }
 
     public static function atPath(string $path): self
     {
-        return new self($path, new YamlParser(), new Finder());
+        return new self($path, new YamlParser());
     }
 
     public function all(): array
     {
-        $files = $this->finder->files()->in($this->path);
+        $files = (new Finder())->files()->in($this->path);
 
         $result = [];
         foreach ($files as $file) {
@@ -65,7 +62,7 @@ final class VaultUsingFilesystem implements Vault
 
     public function notesMatching(Query $query): array
     {
-        $files = $this->finder
+        $files = (new Finder())
             ->files()
             ->in($this->path)
             ->path($query->location() ?? [])

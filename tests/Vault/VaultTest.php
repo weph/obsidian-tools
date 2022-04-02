@@ -246,6 +246,29 @@ abstract class VaultTest extends TestCase
         ];
     }
 
+    /**
+     * @test
+     */
+    public function subsequent_queries_should_return_the_expected_results(): void
+    {
+        $rootNote = new Note('note.md', [], '');
+        $fooNote  = new Note('foo/note.md', [], '');
+        $barNote  = new Note('bar/note.md', [], '');
+        $this->saveAll($rootNote, $fooNote, $barNote);
+
+        self::assertEquals(
+            [new MatchedNote($fooNote, [])],
+            $this->subject()->notesMatching(Query::create()->withLocation('foo'))
+        );
+
+        self::assertEquals(
+            [new MatchedNote($barNote, [])],
+            $this->subject()->notesMatching(Query::create()->withLocation('bar'))
+        );
+
+        self::assertEquals([$rootNote, $fooNote, $barNote], $this->subject()->all());
+    }
+
     abstract protected function subject(): Vault;
 
     private function saveAll(Note|Asset ...$notes): void
