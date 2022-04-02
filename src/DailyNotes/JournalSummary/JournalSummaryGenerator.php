@@ -55,7 +55,7 @@ final class JournalSummaryGenerator
             $content .= "\n\n";
         }
 
-        $note = new Note('Daily Notes/Journal.md', ['parent' => '[[Index]]', 'tags' => ['generated']], $content);
+        $note = new Note('Notes/Daily Notes/Journal.md', ['parent' => '[[Index]]', 'tags' => ['generated']], $content);
 
         $this->vault->save($note);
     }
@@ -80,9 +80,9 @@ final class JournalSummaryGenerator
             $frontMatter['next'] = sprintf('[[%s]]', $nextMonth);
         }
 
-        $location = sprintf('Daily Notes/%04d/%02d/%04d-%02d.md', $year, $month, $year, $month);
+        $location = sprintf('Notes/Daily Notes/%04d/%02d/%04d-%02d.md', $year, $month, $year, $month);
         $content  = sprintf("# %s\n\n", $title);
-        $content .= sprintf("%s\n\n", implode("\n", array_map(static fn (int $day) => sprintf('![[%04d-%02d-%02d.md]]', $year, $month, $day), $this->dailyNotes->days($year, $month))));
+        $content .= sprintf("%s\n\n", implode("\n", array_map(static fn (int $day) => sprintf('![[%04d-%02d-%02d]]', $year, $month, $day), $this->dailyNotes->days($year, $month))));
 
         $note = new Note($location, $frontMatter, $content);
 
