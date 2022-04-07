@@ -88,7 +88,7 @@ final class SwimReportGenerator
     private function swimItems(): SwimItems
     {
         $query = Query::create()
-            ->withContent('/Schwimmen::? (?P<distance>.+) Meter(?: in (?P<time>(?:\d{1,2}:)?\d{2}:\d{2}))?/');
+            ->withContent('/Schwimmen::? (?P<distance>.+) Meter(?: in (?P<time>(?:\d{1,2}:)?\d{1,2}:\d{2}))?/');
 
         $items = SwimItems::empty();
         foreach ($this->vault->notesMatching($query) as $match) {
