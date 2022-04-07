@@ -11,6 +11,12 @@ use Weph\ObsidianTools\Vault\VaultUsingFilesystem;
 
 /**
  * @covers \Weph\ObsidianTools\ReadingListGenerator
+ *
+ * @uses   \Weph\ObsidianTools\Markdown\Table
+ * @uses   \Weph\ObsidianTools\Vault\MatchedNote
+ * @uses   \Weph\ObsidianTools\Vault\Note
+ * @uses   \Weph\ObsidianTools\Vault\Query
+ * @uses   \Weph\ObsidianTools\Vault\VaultUsingFilesystem
  */
 final class ReadingListGeneratorTest extends TestCase
 {
