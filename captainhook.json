@@ -65,6 +65,20 @@
                         ]
                     }
                 ]
+            },
+            {
+                "action": "./vendor/bin/roave-infection-static-analysis-plugin --threads=4 --min-covered-msi=95",
+                "options": [],
+                "conditions": [
+                    {
+                        "exec": "\\CaptainHook\\App\\Hook\\Condition\\FileStaged\\Any",
+                        "args": [
+                            [
+                                "*.php"
+                            ]
+                        ]
+                    }
+                ]
             }
         ]
     },
