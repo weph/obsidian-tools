@@ -92,7 +92,7 @@ final class SwimReportGenerator
 
         $items = SwimItems::empty();
         foreach ($this->vault->notesMatching($query) as $match) {
-            $date = str_replace('.md', '', basename($match->note->path));
+            $date = $match->note->name;
 
             foreach ($match->matches as $item) {
                 $items->add(

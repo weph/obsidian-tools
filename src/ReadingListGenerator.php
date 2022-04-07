@@ -20,8 +20,7 @@ final class ReadingListGenerator
 
         $table = new Table(['Titel']);
         foreach ($this->vault->notesMatching($query) as $matchingNote) {
-            $noteName = str_replace('.md', '', basename($matchingNote->note->path));
-            $link     = sprintf('[[%s]]', $noteName);
+            $link = sprintf('[[%s]]', $matchingNote->note->name);
 
             $table->addRow([$link]);
         }

@@ -36,7 +36,7 @@ final class DailyNotes
         $months = [];
         $years  = [];
         foreach ($matches as $match) {
-            $date = str_replace('.md', '', basename($match->note->path));
+            $date = $match->note->name;
 
             [$year, $month,] = explode('-', $date);
 

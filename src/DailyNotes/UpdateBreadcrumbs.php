@@ -17,7 +17,7 @@ final class UpdateBreadcrumbs
     public function run(): void
     {
         foreach ($this->dailyNotes->all() as $note) {
-            [$year, $month, $day] = explode('-', str_replace('.md', '', basename($note->path)), 3);
+            [$year, $month, $day] = explode('-', $note->name, 3);
 
             $note = $note->withFrontMatterField('parent', sprintf('[[%s-%s]]', $year, $month));
 
