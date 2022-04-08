@@ -1,9 +1,10 @@
 <?php
 declare(strict_types=1);
 
-namespace Weph\ObsidianTools\DailyNotes\SwimReport;
+namespace Weph\ObsidianTools\Actions\SwimReport;
 
 use DateTimeImmutable;
+use Weph\ObsidianTools\Actions\Action;
 use Weph\ObsidianTools\Markdown\Table;
 use Weph\ObsidianTools\Type\Duration;
 use Weph\ObsidianTools\Vault\Asset;
@@ -11,7 +12,7 @@ use Weph\ObsidianTools\Vault\Note;
 use Weph\ObsidianTools\Vault\Query;
 use Weph\ObsidianTools\Vault\Vault;
 
-final class SwimReportGenerator
+final class GenerateSwimReports implements Action
 {
     private Vault $vault;
 

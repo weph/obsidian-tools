@@ -3,10 +3,11 @@
 declare(strict_types=1);
 
 use Symfony\Component\Dotenv\Dotenv;
-use Weph\ObsidianTools\DailyNotes\JournalSummary\JournalSummaryGenerator;
-use Weph\ObsidianTools\DailyNotes\SwimReport\SwimReportGenerator;
-use Weph\ObsidianTools\DailyNotes\UpdateBreadcrumbs;
-use Weph\ObsidianTools\ReadingListGenerator;
+use Weph\ObsidianTools\Actions\Action;
+use Weph\ObsidianTools\Actions\GenerateJournalSummaries;
+use Weph\ObsidianTools\Actions\GenerateReadingList;
+use Weph\ObsidianTools\Actions\SwimReport\GenerateSwimReports;
+use Weph\ObsidianTools\Actions\UpdateBreadcrumbs;
 use Weph\ObsidianTools\Vault\VaultUsingFilesystem;
 
 require_once __DIR__ . '/vendor/autoload.php';
@@ -17,18 +18,18 @@ error_reporting(E_ALL ^ E_DEPRECATED);
 
 $vault = VaultUsingFilesystem::atPath($_ENV['VAULT_PATH']);
 
-printf("Generating swim reports...\n");
-(new SwimReportGenerator($vault))->run();
-printf("Done\n\n");
+/** @var list<Action> $actions */
+$actions = [
+    new GenerateSwimReports($vault),
+    new GenerateJournalSummaries($vault),
+    new UpdateBreadcrumbs($vault),
+    new GenerateReadingList($vault),
+];
 
-printf("Generating journal summaries...\n");
-(new JournalSummaryGenerator($vault))->run();
-printf("Done\n\n");
+foreach ($actions as $action) {
+    printf("Running %s...", get_class($action));
 
-printf("Updating breadcrumbs...\n");
-(new UpdateBreadcrumbs($vault))->run();
-printf("Done\n\n");
+    $action->run();
 
-printf("Generate reading list...\n");
-(new ReadingListGenerator($vault))->run();
-printf("Done\n\n");
+    printf("done\n");
+}

@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Weph\ObsidianTools\DailyNotes\SwimReport;
+namespace Weph\ObsidianTools\Actions\SwimReport;
 
 use Weph\ObsidianTools\Type\Duration;
 

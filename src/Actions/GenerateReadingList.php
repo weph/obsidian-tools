@@ -1,14 +1,14 @@
 <?php
 declare(strict_types=1);
 
-namespace Weph\ObsidianTools;
+namespace Weph\ObsidianTools\Actions;
 
 use Weph\ObsidianTools\Markdown\Table;
 use Weph\ObsidianTools\Vault\Note;
 use Weph\ObsidianTools\Vault\Query;
 use Weph\ObsidianTools\Vault\Vault;
 
-final class ReadingListGenerator
+final class GenerateReadingList implements Action
 {
     public function __construct(private readonly Vault $vault)
     {

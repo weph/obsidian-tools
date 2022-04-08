@@ -1,11 +1,12 @@
 <?php
 declare(strict_types=1);
 
-namespace Weph\ObsidianTools\DailyNotes;
+namespace Weph\ObsidianTools\Actions;
 
+use Weph\ObsidianTools\DailyNotes\DailyNotes;
 use Weph\ObsidianTools\Vault\Vault;
 
-final class UpdateBreadcrumbs
+final class UpdateBreadcrumbs implements Action
 {
     private DailyNotes $dailyNotes;
 

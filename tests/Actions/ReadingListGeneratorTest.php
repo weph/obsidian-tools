@@ -1,16 +1,16 @@
 <?php
 declare(strict_types=1);
 
-namespace Tests\Weph\ObsidianTools;
+namespace Tests\Weph\ObsidianTools\Actions;
 
 use org\bovigo\vfs\vfsStream;
 use PHPUnit\Framework\TestCase;
-use Weph\ObsidianTools\ReadingListGenerator;
+use Weph\ObsidianTools\Actions\GenerateReadingList;
 use Weph\ObsidianTools\Vault\Note;
 use Weph\ObsidianTools\Vault\VaultUsingFilesystem;
 
 /**
- * @covers \Weph\ObsidianTools\ReadingListGenerator
+ * @covers \Weph\ObsidianTools\Actions\GenerateReadingList
  *
  * @uses   \Weph\ObsidianTools\Markdown\Table
  * @uses   \Weph\ObsidianTools\Vault\MatchedNote
@@ -40,7 +40,7 @@ final class ReadingListGeneratorTest extends TestCase
         $this->vault->save(new Note('Notes/Quellen/Bücher/Deep Work.md', [], ''));
         $this->vault->save(new Note('Notes/Quellen/Bücher/BDD in Action.md', [], ''));
 
-        (new ReadingListGenerator($this->vault))->run();
+        (new GenerateReadingList($this->vault))->run();
 
         $note = $this->vault->get('Notes/Leseliste.md');
         self::assertInstanceOf(Note::class, $note);

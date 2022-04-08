@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Weph\ObsidianTools\DailyNotes\JournalSummary;
+namespace Weph\ObsidianTools\Actions;
 
 use DateTimeImmutable;
 use IntlDateFormatter;
@@ -9,7 +9,7 @@ use Weph\ObsidianTools\DailyNotes\DailyNotes;
 use Weph\ObsidianTools\Vault\Note;
 use Weph\ObsidianTools\Vault\Vault;
 
-final class JournalSummaryGenerator
+final class GenerateJournalSummaries implements Action
 {
     private DailyNotes $dailyNotes;
 

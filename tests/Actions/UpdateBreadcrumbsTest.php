@@ -1,17 +1,17 @@
 <?php
 declare(strict_types=1);
 
-namespace Tests\Weph\ObsidianTools\DailyNotes;
+namespace Tests\Weph\ObsidianTools\Actions;
 
 use org\bovigo\vfs\vfsStream;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
-use Weph\ObsidianTools\DailyNotes\UpdateBreadcrumbs;
+use Weph\ObsidianTools\Actions\UpdateBreadcrumbs;
 use Weph\ObsidianTools\Vault\Note;
 use Weph\ObsidianTools\Vault\VaultUsingFilesystem;
 
 /**
- * @covers \Weph\ObsidianTools\DailyNotes\UpdateBreadcrumbs
+ * @covers \Weph\ObsidianTools\Actions\UpdateBreadcrumbs
  *
  * @uses   \Weph\ObsidianTools\DailyNotes\DailyNotes
  * @uses   \Weph\ObsidianTools\Vault\MatchedNote
