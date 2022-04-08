@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use Symfony\Component\Dotenv\Dotenv;
 use Weph\ObsidianTools\Actions\Action;
+use Weph\ObsidianTools\Actions\GenerateBookmarks;
 use Weph\ObsidianTools\Actions\GenerateJournalSummaries;
 use Weph\ObsidianTools\Actions\GenerateReadingList;
 use Weph\ObsidianTools\Actions\SwimReport\GenerateSwimReports;
@@ -24,6 +25,7 @@ $actions = [
     new GenerateJournalSummaries($vault),
     new UpdateBreadcrumbs($vault),
     new GenerateReadingList($vault),
+    new GenerateBookmarks($vault)
 ];
 
 foreach ($actions as $action) {
