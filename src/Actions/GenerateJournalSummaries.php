@@ -63,12 +63,12 @@ final class GenerateJournalSummaries implements Action
     private function createMonthlySummary(int $year, int $month): void
     {
         $formatter = new IntlDateFormatter('de_DE.UTF-8', IntlDateFormatter::NONE, IntlDateFormatter::NONE);
-        $formatter->setPattern('MMMM Y');
+        $formatter->setPattern('MMMM yyyy');
         $title = $formatter->format(DateTimeImmutable::createFromFormat('Ymd', sprintf('%04d%02d01', $year, $month)));
 
         $frontMatter = [
             'parent' => '[[Journal]]',
-            'tags'   => [sprintf('Journal/%04d/%02d', $year, $month)],
+            'tags'   => ['generated', sprintf('Journal/%04d/%02d', $year, $month)],
         ];
 
         $prevMonth = $this->dailyNotes->previousMonth($year, $month);
