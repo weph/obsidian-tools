@@ -153,4 +153,9 @@ final class DailyNotes
 
         return $days[$pos + 1];
     }
+
+    public function get(int $year, int $month, int $day): ?Note
+    {
+        return $this->notes[sprintf('%04d-%02d-%02d', $year, $month, $day)] ?? null;
+    }
 }

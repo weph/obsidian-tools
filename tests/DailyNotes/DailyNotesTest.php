@@ -34,6 +34,29 @@ final class DailyNotesTest extends TestCase
     /**
      * @test
      */
+    public function it_should_return_a_note_by_its_date(): void
+    {
+        $note = new Note('Daily Notes/2020-01-01.md', [], '');
+        $this->vault->save($note);
+
+        $result = (new DailyNotes($this->vault))->get(2020, 1, 1);
+
+        self::assertEquals($note, $result);
+    }
+
+    /**
+     * @test
+     */
+    public function it_should_return_null_if_there_is_no_note_for_a_date(): void
+    {
+        $result = (new DailyNotes($this->vault))->get(2020, 1, 1);
+
+        self::assertNull($result);
+    }
+
+    /**
+     * @test
+     */
     public function it_should_return_a_list_of_all_years_that_have_at_least_one_note(): void
     {
         $this->vault->save(new Note('Daily Notes/2020-01-01.md', [], ''));
