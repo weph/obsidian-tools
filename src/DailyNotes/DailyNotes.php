@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Weph\ObsidianTools\DailyNotes;
 
+use DateTimeImmutable;
 use Weph\ObsidianTools\Vault\Note;
 use Weph\ObsidianTools\Vault\Query;
 use Weph\ObsidianTools\Vault\Vault;
@@ -24,6 +25,11 @@ final class DailyNotes
      */
     private array $months = [];
 
+    /**
+     * @var list<CalendarWeekNotes>
+     */
+    private array $calendarWeeks = [];
+
     public function __construct(private readonly Vault $vault)
     {
         $query = Query::create()
@@ -32,9 +38,10 @@ final class DailyNotes
 
         $matches = $this->vault->notesMatching($query);
 
-        $notes  = [];
-        $months = [];
-        $years  = [];
+        $notes         = [];
+        $months        = [];
+        $years         = [];
+        $calendarWeeks = [];
         foreach ($matches as $match) {
             $date = $match->note->name;
 
@@ -45,15 +52,33 @@ final class DailyNotes
             $month             = sprintf('%s-%s', $year, $month);
             $months[$month]    = 1;
             $years[(int)$year] = 1;
+
+            $dateObject   = new DateTimeImmutable($date);
+            $calendarWeek = $dateObject->format('o-W');
+            if (!isset($calendarWeeks[$calendarWeek])) {
+                $calendarWeeks[$calendarWeek] = [];
+            }
+
+            $calendarWeeks[$calendarWeek][] = new DailyNote($dateObject, $match->note);
         }
 
         ksort($notes);
         ksort($months);
         ksort($years);
+        ksort($calendarWeeks);
 
-        $this->notes  = $notes;
-        $this->months = array_keys($months);
-        $this->years  = array_keys($years);
+        $this->notes         = $notes;
+        $this->months        = array_keys($months);
+        $this->years         = array_keys($years);
+        $this->calendarWeeks = array_map(
+            static function (string $calendarWeek, array $dailyNotes) {
+                [$year, $week] = explode('-', $calendarWeek);
+
+                return new CalendarWeekNotes((int)$year, (int)$week, $dailyNotes);
+            },
+            array_keys($calendarWeeks),
+            $calendarWeeks
+        );
     }
 
     /**
@@ -62,6 +87,14 @@ final class DailyNotes
     public function all(): array
     {
         return array_values($this->notes);
+    }
+
+    /**
+     * @return list<CalendarWeekNotes>
+     */
+    public function calendarWeeks(): array
+    {
+        return $this->calendarWeeks;
     }
 
     /**
@@ -154,8 +187,14 @@ final class DailyNotes
         return $days[$pos + 1];
     }
 
-    public function get(int $year, int $month, int $day): ?Note
+    public function get(int $year, int $month, int $day): ?DailyNote
     {
-        return $this->notes[sprintf('%04d-%02d-%02d', $year, $month, $day)] ?? null;
+        $note = $this->notes[sprintf('%04d-%02d-%02d', $year, $month, $day)] ?? null;
+
+        if ($note === null) {
+            return null;
+        }
+
+        return new DailyNote(new DateTimeImmutable(sprintf('%04d-%02d-%02d', $year, $month, $day)), $note);
     }
 }

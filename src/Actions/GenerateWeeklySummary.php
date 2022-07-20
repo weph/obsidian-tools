@@ -3,7 +3,8 @@ declare(strict_types=1);
 
 namespace Weph\ObsidianTools\Actions;
 
-use DateTimeImmutable;
+use Weph\ObsidianTools\DailyNotes\CalendarWeekNotes;
+use Weph\ObsidianTools\DailyNotes\DailyNote;
 use Weph\ObsidianTools\DailyNotes\DailyNotes;
 use Weph\ObsidianTools\Markdown\Table;
 use Weph\ObsidianTools\Vault\Note;
@@ -20,108 +21,73 @@ final class GenerateWeeklySummary implements Action
 
     public function run(): void
     {
-        $weeks = [];
+        $weeks = $this->dailyNotes->calendarWeeks();
 
-        foreach ($this->dailyNotes->years() as $year) {
-            foreach ($this->dailyNotes->months($year) as $month) {
-                foreach ($this->dailyNotes->days($year, $month) as $day) {
-                    $date = new DateTimeImmutable(sprintf('%04d-%02d-%02d', $year, $month, $day));
+        foreach ($weeks as $index => $data) {
+            $location = sprintf('Notes/Daily Notes/%04d/%s.md', $data->year, $this->noteName($data));
 
-                    $week = $date->format('o-\WW');
+            $content = sprintf("# %s - KW %s\n\n", $data->year, $data->week);
+            $content .= $this->habitTracker($data);
+            $content .= $this->dailyNotes($data);
 
-                    if (!isset($weeks[$week])) {
-                        $weeks[$week] = [
-                            'year'  => $date->format('o'),
-                            'week'  => $date->format('W'),
-                            'notes' => [],
-                        ];
-                    }
+            $frontMatter = [];
 
-                    $weeks[$week]['notes'][] = $this->dailyNotes->get((int)$date->format('Y'), (int)$date->format('m'), (int)$date->format('d'));
-                }
-            }
-        }
-
-        foreach ($weeks as $current => $data) {
-            $location = sprintf('Notes/Daily Notes/%04d/%s-W%s.md', $data['year'], $data['year'], $data['week']);
-            $content  = sprintf("# %s - KW %s\n\n", $data['year'], (int)$data['week']);
-
-            $tags = [];
-            foreach (array_filter($data['notes']) as $note) {
-                if (!preg_match_all('/(#[a-z0-9\/]+)/', $note->content, $matches)) {
-                    continue;
-                }
-
-                foreach ($matches[1] as $tag) {
-                    if (!isset($tags[$tag])) {
-                        $tags[$tag] = array_fill(0, 7, '');
-                    }
-                }
-
-                $day = ((int)(new DateTimeImmutable($note->name))->format('N')) - 1;
-                foreach ($matches[1] as $tag) {
-                    $tags[$tag][$day] .= '✓';
-                }
+            if ($index > 0) {
+                $frontMatter['prev'] = sprintf('[[%s]]', $this->noteName($weeks[$index - 1]));
             }
 
-            if (count($tags)) {
-                $table = new Table(['', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So']);
-                foreach ($tags as $tag => $days) {
-                    $table->addRow([$tag, ...$days]);
-                }
-
-                $content .= "## Habits\n\n";
-                $content .= $table->render();
+            if ($index < count($weeks) - 1) {
+                $frontMatter['next'] = sprintf('[[%s]]', $this->noteName($weeks[$index + 1]));
             }
 
-            $content .= "## Notes\n\n";
-            $content .= sprintf("%s\n\n", implode("\n", array_map(static fn (Note $v) => sprintf('![[%s]]', $v->name), array_filter($data['notes']))));
+            $dailyNote = new Note($location, $frontMatter, $content);
 
-            $frontMatter  = [];
-            $previousWeek = $this->previousWeek($weeks, $current);
-            $nextWeek     = $this->nextWeek($weeks, $current);
-
-            if ($previousWeek !== null) {
-                $frontMatter['prev'] = sprintf('[[%s]]', $previousWeek);
-            }
-
-            if ($nextWeek !== null) {
-                $frontMatter['next'] = sprintf('[[%s]]', $nextWeek);
-            }
-
-            $note = new Note($location, $frontMatter, $content);
-
-            $this->vault->save($note);
+            $this->vault->save($dailyNote);
         }
     }
 
-    /**
-     * @param array<string, mixed> $weeks
-     */
-    private function previousWeek(array $weeks, string $current): ?string
+    private function habitTracker(CalendarWeekNotes $calendarWeekNotes): string
     {
-        $keys  = array_keys($weeks);
-        $index = array_search($current, $keys);
+        $tags = [];
+        foreach ($calendarWeekNotes->dailyNotes as $dailyNote) {
+            if (!preg_match_all('/(#[a-z0-9\/]+)/', $dailyNote->note->content, $matches)) {
+                continue;
+            }
 
-        if ($index === false) {
-            return null;
+            foreach ($matches[1] as $tag) {
+                if (!isset($tags[$tag])) {
+                    $tags[$tag] = array_fill(0, 7, '');
+                }
+            }
+
+            $day = ((int)($dailyNote->date)->format('N')) - 1;
+            foreach ($matches[1] as $tag) {
+                $tags[$tag][$day] .= '✓';
+            }
         }
 
-        return $keys[$index - 1] ?? null;
+        if (count($tags) === 0) {
+            return '';
+        }
+
+        $table = new Table(['', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So']);
+        foreach ($tags as $tag => $days) {
+            $table->addRow([$tag, ...$days]);
+        }
+
+        return sprintf("## Habits\n\n%s\n\n", $table->render());
     }
 
-    /**
-     * @param array<string, mixed> $weeks
-     */
-    private function nextWeek(array $weeks, string $current): ?string
+    private function dailyNotes(CalendarWeekNotes $calendarWeekNotes): string
     {
-        $keys  = array_keys($weeks);
-        $index = array_search($current, $keys);
+        return sprintf(
+            "## Notes\n\n%s\n\n",
+            implode("\n", array_map(static fn (DailyNote $v) => sprintf('![[%s]]', $v->note->name), $calendarWeekNotes->dailyNotes))
+        );
+    }
 
-        if ($index === false) {
-            return null;
-        }
-
-        return $keys[$index + 1] ?? null;
+    private function noteName(CalendarWeekNotes $calendarWeekNotes): string
+    {
+        return sprintf('%04d-W%02d', $calendarWeekNotes->year, $calendarWeekNotes->week);
     }
 }

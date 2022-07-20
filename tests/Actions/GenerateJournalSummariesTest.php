@@ -14,6 +14,8 @@ use Weph\ObsidianTools\Vault\VaultUsingFilesystem;
 /**
  * @covers \Weph\ObsidianTools\Actions\GenerateJournalSummaries
  *
+ * @uses   \Weph\ObsidianTools\DailyNotes\CalendarWeekNotes
+ * @uses   \Weph\ObsidianTools\DailyNotes\DailyNote
  * @uses   \Weph\ObsidianTools\DailyNotes\DailyNotes
  * @uses   \Weph\ObsidianTools\Vault\MatchedNote
  * @uses   \Weph\ObsidianTools\Vault\Note

@@ -3,8 +3,11 @@ declare(strict_types=1);
 
 namespace Tests\Weph\ObsidianTools\DailyNotes;
 
+use DateTimeImmutable;
 use org\bovigo\vfs\vfsStream;
 use PHPUnit\Framework\TestCase;
+use Weph\ObsidianTools\DailyNotes\CalendarWeekNotes;
+use Weph\ObsidianTools\DailyNotes\DailyNote;
 use Weph\ObsidianTools\DailyNotes\DailyNotes;
 use Weph\ObsidianTools\Vault\Note;
 use Weph\ObsidianTools\Vault\Vault;
@@ -13,6 +16,8 @@ use Weph\ObsidianTools\Vault\VaultUsingFilesystem;
 /**
  * @covers \Weph\ObsidianTools\DailyNotes\DailyNotes
  *
+ * @uses   \Weph\ObsidianTools\DailyNotes\CalendarWeekNotes
+ * @uses   \Weph\ObsidianTools\DailyNotes\DailyNote
  * @uses   \Weph\ObsidianTools\Vault\Note
  * @uses   \Weph\ObsidianTools\Vault\MatchedNote
  * @uses   \Weph\ObsidianTools\Vault\VaultUsingFilesystem
@@ -34,6 +39,42 @@ final class DailyNotesTest extends TestCase
     /**
      * @test
      */
+    public function it_should_return_daily_notes_per_calendar_week(): void
+    {
+        $this->vault->save(new Note('Notes/Daily Notes/2022-01-01.md', [], ''));
+        $this->vault->save(new Note('Notes/Daily Notes/2022-01-02.md', [], ''));
+
+        $this->vault->save(new Note('Notes/Daily Notes/2022-01-03.md', [], ''));
+        $this->vault->save(new Note('Notes/Daily Notes/2022-01-04.md', [], ''));
+        $this->vault->save(new Note('Notes/Daily Notes/2022-01-05.md', [], ''));
+        $this->vault->save(new Note('Notes/Daily Notes/2022-01-06.md', [], ''));
+        $this->vault->save(new Note('Notes/Daily Notes/2022-01-07.md', [], ''));
+        $this->vault->save(new Note('Notes/Daily Notes/2022-01-08.md', [], ''));
+        $this->vault->save(new Note('Notes/Daily Notes/2022-01-09.md', [], ''));
+
+        $this->vault->save(new Note('Notes/Daily Notes/2022-01-10.md', [], ''));
+
+        $result = (new DailyNotes($this->vault))->calendarWeeks();
+
+        self::assertEquals(
+            [
+                ['2021-52', ['2022-01-01', '2022-01-02']],
+                ['2022-1', ['2022-01-03', '2022-01-04', '2022-01-05', '2022-01-06', '2022-01-07', '2022-01-08', '2022-01-09']],
+                ['2022-2', ['2022-01-10']],
+            ],
+            array_map(
+                static fn (CalendarWeekNotes $wn) => [
+                    sprintf('%s-%s', $wn->year, $wn->week),
+                    array_map(static fn (DailyNote $dn) => $dn->note->name, $wn->dailyNotes),
+                ],
+                $result
+            )
+        );
+    }
+
+    /**
+     * @test
+     */
     public function it_should_return_a_note_by_its_date(): void
     {
         $note = new Note('Daily Notes/2020-01-01.md', [], '');
@@ -41,7 +82,9 @@ final class DailyNotesTest extends TestCase
 
         $result = (new DailyNotes($this->vault))->get(2020, 1, 1);
 
-        self::assertEquals($note, $result);
+        self::assertInstanceOf(DailyNote::class, $result);
+        self::assertEquals(new DateTimeImmutable('2020-01-01'), $result->date);
+        self::assertEquals($note, $result->note);
     }
 
     /**
