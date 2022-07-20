@@ -5,6 +5,7 @@ namespace Weph\ObsidianTools\Actions;
 
 use DateTimeImmutable;
 use Weph\ObsidianTools\DailyNotes\DailyNotes;
+use Weph\ObsidianTools\Markdown\Table;
 use Weph\ObsidianTools\Vault\Note;
 use Weph\ObsidianTools\Vault\Vault;
 
@@ -36,7 +37,7 @@ final class GenerateWeeklySummary implements Action
                         ];
                     }
 
-                    $weeks[$week]['notes'][] = $date->format('Y-m-d');
+                    $weeks[$week]['notes'][] = $this->dailyNotes->get((int)$date->format('Y'), (int)$date->format('m'), (int)$date->format('d'));
                 }
             }
         }
@@ -44,7 +45,37 @@ final class GenerateWeeklySummary implements Action
         foreach ($weeks as $current => $data) {
             $location = sprintf('Notes/Daily Notes/%04d/%s-W%s.md', $data['year'], $data['year'], $data['week']);
             $content  = sprintf("# %s - KW %s\n\n", $data['year'], (int)$data['week']);
-            $content .= sprintf("%s\n\n", implode("\n", array_map(static fn (string $v) => sprintf('![[%s]]', $v), $data['notes'])));
+
+            $tags = [];
+            foreach (array_filter($data['notes']) as $note) {
+                if (!preg_match_all('/(#[a-z0-9\/]+)/', $note->content, $matches)) {
+                    continue;
+                }
+
+                foreach ($matches[1] as $tag) {
+                    if (!isset($tags[$tag])) {
+                        $tags[$tag] = array_fill(0, 7, '');
+                    }
+                }
+
+                $day = ((int)(new DateTimeImmutable($note->name))->format('N')) - 1;
+                foreach ($matches[1] as $tag) {
+                    $tags[$tag][$day] .= '✓';
+                }
+            }
+
+            if (count($tags)) {
+                $table = new Table(['', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So']);
+                foreach ($tags as $tag => $days) {
+                    $table->addRow([$tag, ...$days]);
+                }
+
+                $content .= "## Habits\n\n";
+                $content .= $table->render();
+            }
+
+            $content .= "## Notes\n\n";
+            $content .= sprintf("%s\n\n", implode("\n", array_map(static fn (Note $v) => sprintf('![[%s]]', $v->name), array_filter($data['notes']))));
 
             $frontMatter  = [];
             $previousWeek = $this->previousWeek($weeks, $current);

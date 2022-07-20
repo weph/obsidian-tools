@@ -12,6 +12,7 @@ use Weph\ObsidianTools\Vault\VaultUsingFilesystem;
 /**
  * @covers \Weph\ObsidianTools\Actions\GenerateWeeklySummary
  *
+ * @uses   \Weph\ObsidianTools\Markdown\Table
  * @uses   \Weph\ObsidianTools\DailyNotes\DailyNotes
  * @uses   \Weph\ObsidianTools\Vault\MatchedNote
  * @uses   \Weph\ObsidianTools\Vault\Note
@@ -59,6 +60,8 @@ final class GenerateWeeklySummaryTest extends TestCase
                 [
                     '# 2021 - KW 52',
                     '',
+                    '## Notes',
+                    '',
                     '![[2022-01-01]]',
                     '![[2022-01-02]]',
                     '',
@@ -75,6 +78,8 @@ final class GenerateWeeklySummaryTest extends TestCase
                 "\n",
                 [
                     '# 2022 - KW 1',
+                    '',
+                    '## Notes',
                     '',
                     '![[2022-01-03]]',
                     '![[2022-01-04]]',
@@ -97,6 +102,8 @@ final class GenerateWeeklySummaryTest extends TestCase
                 "\n",
                 [
                     '# 2022 - KW 2',
+                    '',
+                    '## Notes',
                     '',
                     '![[2022-01-10]]',
                     '',
@@ -130,6 +137,35 @@ final class GenerateWeeklySummaryTest extends TestCase
 
         self::assertNoteHasFrontmatter('prev', '[[2022-W23]]', $this->vault->get('Notes/Daily Notes/2022/2022-W26.md'));
         self::assertNoteDoesNotHaveFrontmatterField('next', $this->vault->get('Notes/Daily Notes/2022/2022-W26.md'));
+    }
+
+    /**
+     * @test
+     */
+    public function it_should_include_a_habit_tracker(): void
+    {
+        $this->vault->save(new Note('Notes/Daily Notes/2022-05-02.md', [], '- #track/a'));
+        $this->vault->save(new Note('Notes/Daily Notes/2022-05-03.md', [], '- #track/b'));
+        $this->vault->save(new Note('Notes/Daily Notes/2022-05-04.md', [], '- #track/c'));
+        $this->vault->save(new Note('Notes/Daily Notes/2022-05-05.md', [], '- #track/d'));
+        $this->vault->save(new Note('Notes/Daily Notes/2022-05-06.md', [], '- #track/e'));
+        $this->vault->save(new Note('Notes/Daily Notes/2022-05-07.md', [], ''));
+        $this->vault->save(new Note('Notes/Daily Notes/2022-05-08.md', [], '#track/a #track/b #track/c #track/d #track/e #track/f'));
+
+        (new GenerateWeeklySummary($this->vault))->run();
+
+        self::assertStringContainsString(
+            "## Habits\n\n" .
+            "|          | Mo | Di | Mi | Do | Fr | Sa | So |\n" .
+            "| -------- | -- | -- | -- | -- | -- | -- | -- |\n" .
+            "| #track/a | ✓  |    |    |    |    |    | ✓  |\n" .
+            "| #track/b |    | ✓  |    |    |    |    | ✓  |\n" .
+            "| #track/c |    |    | ✓  |    |    |    | ✓  |\n" .
+            "| #track/d |    |    |    | ✓  |    |    | ✓  |\n" .
+            "| #track/e |    |    |    |    | ✓  |    | ✓  |\n" .
+            "| #track/f |    |    |    |    |    |    | ✓  |\n",
+            $this->vault->get('Notes/Daily Notes/2022/2022-W18.md')->content
+        );
     }
 
     private static function assertNoteHasFrontmatter(string $field, mixed $value, mixed $note): void
