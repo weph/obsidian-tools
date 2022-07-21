@@ -42,16 +42,16 @@ final class DailyNotesTest extends TestCase
     public function it_should_return_daily_notes_per_calendar_week(): void
     {
         $this->vault->save(new Note('Notes/Daily Notes/2022-01-01.md', [], ''));
-        $this->vault->save(new Note('Notes/Daily Notes/2022-01-02.md', [], ''));
 
-        $this->vault->save(new Note('Notes/Daily Notes/2022-01-03.md', [], ''));
+        $this->vault->save(new Note('Notes/Daily Notes/2022-01-08.md', [], ''));
         $this->vault->save(new Note('Notes/Daily Notes/2022-01-04.md', [], ''));
         $this->vault->save(new Note('Notes/Daily Notes/2022-01-05.md', [], ''));
-        $this->vault->save(new Note('Notes/Daily Notes/2022-01-06.md', [], ''));
         $this->vault->save(new Note('Notes/Daily Notes/2022-01-07.md', [], ''));
-        $this->vault->save(new Note('Notes/Daily Notes/2022-01-08.md', [], ''));
+        $this->vault->save(new Note('Notes/Daily Notes/2022-01-06.md', [], ''));
         $this->vault->save(new Note('Notes/Daily Notes/2022-01-09.md', [], ''));
+        $this->vault->save(new Note('Notes/Daily Notes/2022-01-03.md', [], ''));
 
+        $this->vault->save(new Note('Notes/Daily Notes/2022-01-02.md', [], ''));
         $this->vault->save(new Note('Notes/Daily Notes/2022-01-10.md', [], ''));
 
         $result = (new DailyNotes($this->vault))->calendarWeeks();

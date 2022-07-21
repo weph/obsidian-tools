@@ -59,7 +59,7 @@ final class DailyNotes
                 $calendarWeeks[$calendarWeek] = [];
             }
 
-            $calendarWeeks[$calendarWeek][] = new DailyNote($dateObject, $match->note);
+            $calendarWeeks[$calendarWeek][$dateObject->getTimestamp()] = new DailyNote($dateObject, $match->note);
         }
 
         ksort($notes);
@@ -74,7 +74,9 @@ final class DailyNotes
             static function (string $calendarWeek, array $dailyNotes) {
                 [$year, $week] = explode('-', $calendarWeek);
 
-                return new CalendarWeekNotes((int)$year, (int)$week, $dailyNotes);
+                ksort($dailyNotes);
+
+                return new CalendarWeekNotes((int)$year, (int)$week, array_values($dailyNotes));
             },
             array_keys($calendarWeeks),
             $calendarWeeks
