@@ -7,9 +7,9 @@ use Weph\ObsidianTools\Actions\Action;
 use Weph\ObsidianTools\Actions\GenerateBookmarks;
 use Weph\ObsidianTools\Actions\GenerateJournalSummaries;
 use Weph\ObsidianTools\Actions\GenerateReadingList;
-use Weph\ObsidianTools\Actions\GenerateWeeklySummary;
 use Weph\ObsidianTools\Actions\SwimReport\GenerateSwimReports;
 use Weph\ObsidianTools\Actions\UpdateBreadcrumbs;
+use Weph\ObsidianTools\Actions\WeeklySummary\GenerateWeeklySummary;
 use Weph\ObsidianTools\Vault\VaultUsingFilesystem;
 
 require_once __DIR__ . '/vendor/autoload.php';
@@ -24,14 +24,23 @@ $vault = VaultUsingFilesystem::atPath($_ENV['VAULT_PATH']);
 $actions = [
     new GenerateSwimReports($vault),
     new GenerateJournalSummaries($vault),
-    new GenerateWeeklySummary($vault),
+    new GenerateWeeklySummary($vault, ['tagLabels' => [
+        'track/reading'           => 'Lesen',
+        'track/writing'           => 'Schreiben',
+        'track/coding'            => 'Coden',
+        'track/drawing'           => 'Zeichnen',
+        'track/languageexchange'  => 'Sprachaustausch',
+        'track/englishvocabulary' => 'Englisch Vokabeln',
+        'track/swimming'          => 'Schwimmen',
+        'track/workout'           => 'Workout',
+    ]]),
     new UpdateBreadcrumbs($vault),
     new GenerateReadingList($vault),
-    new GenerateBookmarks($vault)
+    new GenerateBookmarks($vault),
 ];
 
 foreach ($actions as $action) {
-    printf("Running %s...", get_class($action));
+    printf('Running %s...', get_class($action));
 
     $action->run();
 

@@ -1,16 +1,16 @@
 <?php
 declare(strict_types=1);
 
-namespace Tests\Weph\ObsidianTools\Actions;
+namespace Tests\Weph\ObsidianTools\Actions\WeeklySummary;
 
 use org\bovigo\vfs\vfsStream;
 use PHPUnit\Framework\TestCase;
-use Weph\ObsidianTools\Actions\GenerateWeeklySummary;
+use Weph\ObsidianTools\Actions\WeeklySummary\GenerateWeeklySummary;
 use Weph\ObsidianTools\Vault\Note;
 use Weph\ObsidianTools\Vault\VaultUsingFilesystem;
 
 /**
- * @covers \Weph\ObsidianTools\Actions\GenerateWeeklySummary
+ * @covers \Weph\ObsidianTools\Actions\WeeklySummary\GenerateWeeklySummary
  *
  * @uses   \Weph\ObsidianTools\Markdown\Table
  * @uses   \Weph\ObsidianTools\DailyNotes\CalendarWeekNotes
@@ -20,6 +20,7 @@ use Weph\ObsidianTools\Vault\VaultUsingFilesystem;
  * @uses   \Weph\ObsidianTools\Vault\Note
  * @uses   \Weph\ObsidianTools\Vault\Query
  * @uses   \Weph\ObsidianTools\Vault\VaultUsingFilesystem
+ * @uses   \Weph\ObsidianTools\Actions\WeeklySummary\HabitTracker
  */
 final class GenerateWeeklySummaryTest extends TestCase
 {
@@ -52,7 +53,7 @@ final class GenerateWeeklySummaryTest extends TestCase
 
         $this->vault->save(new Note('Notes/Daily Notes/2022-01-10.md', [], ''));
 
-        (new GenerateWeeklySummary($this->vault))->run();
+        (new GenerateWeeklySummary($this->vault, []))->run();
 
         $note = $this->vault->get('Notes/Daily Notes/2021/2021-W52.md');
         self::assertInstanceOf(Note::class, $note);
@@ -126,7 +127,7 @@ final class GenerateWeeklySummaryTest extends TestCase
         $this->vault->save(new Note('Notes/Daily Notes/2022-06-06.md', [], ''));
         $this->vault->save(new Note('Notes/Daily Notes/2022-06-30.md', [], ''));
 
-        (new GenerateWeeklySummary($this->vault))->run();
+        (new GenerateWeeklySummary($this->vault, []))->run();
 
         self::assertNoteDoesNotHaveFrontmatterField('prev', $this->vault->get('Notes/Daily Notes/2022/2022-W17.md'));
         self::assertNoteHasFrontmatter('next', '[[2022-W22]]', $this->vault->get('Notes/Daily Notes/2022/2022-W17.md'));
@@ -154,18 +155,25 @@ final class GenerateWeeklySummaryTest extends TestCase
         $this->vault->save(new Note('Notes/Daily Notes/2022-05-07.md', [], ''));
         $this->vault->save(new Note('Notes/Daily Notes/2022-05-08.md', [], '#track/a #track/b #track/c #track/d #track/e #track/f'));
 
-        (new GenerateWeeklySummary($this->vault))->run();
+        (new GenerateWeeklySummary($this->vault, ['tagLabels' => [
+            'track/a' => 'A',
+            'track/b' => 'B',
+            'track/c' => 'C',
+            'track/d' => 'D',
+            'track/e' => 'E',
+            'track/f' => 'F',
+        ]]))->run();
 
         self::assertStringContainsString(
             "## Habits\n\n" .
-            "|          | Mo | Di | Mi | Do | Fr | Sa | So |\n" .
-            "| -------- | -- | -- | -- | -- | -- | -- | -- |\n" .
-            "| #track/a | ✓  |    |    |    |    |    | ✓  |\n" .
-            "| #track/b |    | ✓  |    |    |    |    | ✓  |\n" .
-            "| #track/c |    |    | ✓  |    |    |    | ✓  |\n" .
-            "| #track/d |    |    |    | ✓  |    |    | ✓  |\n" .
-            "| #track/e |    |    |    |    | ✓  |    | ✓  |\n" .
-            "| #track/f |    |    |    |    |    |    | ✓  |\n",
+            "|   | Mo | Di | Mi | Do | Fr | Sa | So |\n" .
+            "| - | -- | -- | -- | -- | -- | -- | -- |\n" .
+            "| A | ✓  |    |    |    |    |    | ✓  |\n" .
+            "| B |    | ✓  |    |    |    |    | ✓  |\n" .
+            "| C |    |    | ✓  |    |    |    | ✓  |\n" .
+            "| D |    |    |    | ✓  |    |    | ✓  |\n" .
+            "| E |    |    |    |    | ✓  |    | ✓  |\n" .
+            "| F |    |    |    |    |    |    | ✓  |\n",
             $this->vault->get('Notes/Daily Notes/2022/2022-W18.md')->content
         );
     }
