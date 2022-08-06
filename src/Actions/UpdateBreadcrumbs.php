@@ -17,8 +17,12 @@ final class UpdateBreadcrumbs implements Action
 
     public function run(): void
     {
-        foreach ($this->dailyNotes->all() as $note) {
-            [$year, $month, $day] = explode('-', $note->name, 3);
+        foreach ($this->dailyNotes->all() as $dailyNote) {
+            $year  = $dailyNote->date->format('Y');
+            $month = $dailyNote->date->format('m');
+            $day   = $dailyNote->date->format('d');
+
+            $note = $dailyNote->note;
 
             $note = $note->withFrontMatterField('parent', sprintf('[[%s-%s]]', $year, $month));
 

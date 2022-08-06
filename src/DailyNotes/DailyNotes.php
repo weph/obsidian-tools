@@ -4,14 +4,13 @@ declare(strict_types=1);
 namespace Weph\ObsidianTools\DailyNotes;
 
 use DateTimeImmutable;
-use Weph\ObsidianTools\Vault\Note;
 use Weph\ObsidianTools\Vault\Query;
 use Weph\ObsidianTools\Vault\Vault;
 
 final class DailyNotes
 {
     /**
-     * @var array<string, Note>
+     * @var array<string, DailyNote>
      */
     private array $notes = [];
 
@@ -43,23 +42,21 @@ final class DailyNotes
         $years         = [];
         $calendarWeeks = [];
         foreach ($matches as $match) {
-            $date = $match->note->name;
+            $date      = new DateTimeImmutable($match->note->name);
+            $dailyNote = new DailyNote($date, $match->note);
 
-            [$year, $month,] = explode('-', $date);
+            $notes[$date->format('Y-m-d')] = $dailyNote;
 
-            $notes[$date] = $match->note;
+            $month                          = $date->format('Y-m');
+            $months[$month]                 = 1;
+            $years[(int)$date->format('Y')] = 1;
 
-            $month             = sprintf('%s-%s', $year, $month);
-            $months[$month]    = 1;
-            $years[(int)$year] = 1;
-
-            $dateObject   = new DateTimeImmutable($date);
-            $calendarWeek = $dateObject->format('o-W');
+            $calendarWeek = $date->format('o-W');
             if (!isset($calendarWeeks[$calendarWeek])) {
                 $calendarWeeks[$calendarWeek] = [];
             }
 
-            $calendarWeeks[$calendarWeek][$dateObject->getTimestamp()] = new DailyNote($dateObject, $match->note);
+            $calendarWeeks[$calendarWeek][$date->getTimestamp()] = $dailyNote;
         }
 
         ksort($notes);
@@ -84,7 +81,7 @@ final class DailyNotes
     }
 
     /**
-     * @return list<Note>
+     * @return list<DailyNote>
      */
     public function all(): array
     {
@@ -197,6 +194,6 @@ final class DailyNotes
             return null;
         }
 
-        return new DailyNote(new DateTimeImmutable(sprintf('%04d-%02d-%02d', $year, $month, $day)), $note);
+        return $note;
     }
 }
