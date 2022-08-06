@@ -24,7 +24,12 @@ final class UpdateBreadcrumbs implements Action
 
             $note = $dailyNote->note;
 
-            $note = $note->withFrontMatterField('parent', sprintf('[[%s-%s]]', $year, $month));
+            $parents = [
+                $dailyNote->date->format('o-\WW'),
+                $dailyNote->date->format('Y-m'),
+            ];
+
+            $note = $note->withFrontMatterField('parent', array_map(static fn (string $s) => sprintf('[[%s]]', $s), $parents));
 
             $prev = $this->dailyNotes->previousDay((int)$year, (int)$month, (int)$day);
             if ($prev !== null) {

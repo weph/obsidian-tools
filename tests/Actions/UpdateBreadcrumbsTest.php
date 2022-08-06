@@ -45,9 +45,9 @@ final class UpdateBreadcrumbsTest extends TestCase
 
         (new UpdateBreadcrumbs($this->vault))->run();
 
-        self::assertFrontMatter(['parent' => '[[2022-01]]', 'next' => '[[2022-01-02]]'], 'Notes/Daily Notes/2022-01-01.md');
-        self::assertFrontMatter(['parent' => '[[2022-01]]', 'prev' => '[[2022-01-01]]', 'next' => '[[2022-02-01]]'], 'Notes/Daily Notes/2022-01-02.md');
-        self::assertFrontMatter(['parent' => '[[2022-02]]', 'prev' => '[[2022-01-02]]'], 'Notes/Daily Notes/2022-02-01.md');
+        self::assertFrontMatter(['parent' => ['[[2021-W52]]', '[[2022-01]]'], 'next' => '[[2022-01-02]]'], 'Notes/Daily Notes/2022-01-01.md');
+        self::assertFrontMatter(['parent' => ['[[2021-W52]]', '[[2022-01]]'], 'prev' => '[[2022-01-01]]', 'next' => '[[2022-02-01]]'], 'Notes/Daily Notes/2022-01-02.md');
+        self::assertFrontMatter(['parent' => ['[[2022-W05]]', '[[2022-02]]'], 'prev' => '[[2022-01-02]]'], 'Notes/Daily Notes/2022-02-01.md');
     }
 
     private function assertFrontMatter(array $frontMatter, string $noteLocation): void
