@@ -42,7 +42,7 @@ final class GenerateWeeklySummary implements Action
 
             $content .= $this->dailyNotes($data);
 
-            $frontMatter = [];
+            $frontMatter = ['parent' => '[[Journal]]'];
 
             if ($index > 0) {
                 $frontMatter['prev'] = sprintf('[[%s]]', $this->noteName($weeks[$index - 1]));
