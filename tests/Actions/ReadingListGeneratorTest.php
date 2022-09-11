@@ -34,7 +34,66 @@ final class ReadingListGeneratorTest extends TestCase
     /**
      * @test
      */
-    public function it_should_build_a_table_of_all_books(): void
+    public function it_should_build_a_table_of_all_book_the_have_been_started_or_finished(): void
+    {
+        $this->vault->save(new Note('a.md', [], '- Started reading "BDD in Action" #book/started'));
+        $this->vault->save(new Note('b.md', [], '- Finished reading "Test-Driven Development by Example" #book/finished'));
+        $this->vault->save(new Note('c.md', [], '- Started listening to "Digital Minimalism" #audiobook/started'));
+
+        (new GenerateReadingList($this->vault))->run();
+
+        $note = $this->vault->get('Notes/Leseliste.md');
+        self::assertInstanceOf(Note::class, $note);
+        self::assertEquals(['parent' => '[[Index]]', 'tags' => ['generated']], $note->frontMatter);
+        self::assertEquals(
+            implode(
+                "\n",
+                [
+                    '# Leseliste',
+                    '',
+                    '| Titel                              |',
+                    '| ---------------------------------- |',
+                    '| BDD in Action                      |',
+                    '| Digital Minimalism                 |',
+                    '| Test-Driven Development by Example |',
+                    '',
+                ]
+            ),
+            $note->content
+        );
+    }
+
+    public function it_should_link_to_the_corresponding_note(): void
+    {
+        $this->vault->save(new Note('a.md', [], '- Started reading [[BDD in Action]] #book/started'));
+        $this->vault->save(new Note('b.md', [], '- Started reading [[Test-Driven Development by Example]] #book/finished'));
+
+        (new GenerateReadingList($this->vault))->run();
+
+        $note = $this->vault->get('Notes/Leseliste.md');
+        self::assertInstanceOf(Note::class, $note);
+        self::assertEquals(['parent' => '[[Index]]', 'tags' => ['generated']], $note->frontMatter);
+        self::assertEquals(
+            implode(
+                "\n",
+                [
+                    '# Leseliste',
+                    '',
+                    '| Titel                                  |',
+                    '| -------------------------------------- |',
+                    '| [[BDD in Action]]                      |',
+                    '| [[Test-Driven Development by Example]] |',
+                    '',
+                ]
+            ),
+            $note->content
+        );
+    }
+
+    /**
+     * @test
+     */
+    public function it_should_include_book_notes(): void
     {
         $this->vault->save(new Note('Notes/Quellen/Bücher/Test-Driven Development by Example.md', [], ''));
         $this->vault->save(new Note('Notes/Quellen/Bücher/Deep Work.md', [], ''));
@@ -53,9 +112,43 @@ final class ReadingListGeneratorTest extends TestCase
                     '',
                     '| Titel                                  |',
                     '| -------------------------------------- |',
-                    '| [[Test-Driven Development by Example]] |',
-                    '| [[Deep Work]]                          |',
                     '| [[BDD in Action]]                      |',
+                    '| [[Deep Work]]                          |',
+                    '| [[Test-Driven Development by Example]] |',
+                    '',
+                ]
+            ),
+            $note->content
+        );
+    }
+
+    /**
+     * @test
+     */
+    public function books_should_be_ordered_alphabetically(): void
+    {
+        $this->vault->save(new Note('a.md', [], '- "The Art of War" #book/started'));
+        $this->vault->save(new Note('b.md', [], '- "Ulysses" #book/started'));
+        $this->vault->save(new Note('c.md', [], '- "A Tale of Two Cities" #book/started'));
+        $this->vault->save(new Note('d.md', [], '- "Don Quixote" #book/started'));
+
+        (new GenerateReadingList($this->vault))->run();
+
+        $note = $this->vault->get('Notes/Leseliste.md');
+        self::assertInstanceOf(Note::class, $note);
+        self::assertEquals(['parent' => '[[Index]]', 'tags' => ['generated']], $note->frontMatter);
+        self::assertEquals(
+            implode(
+                "\n",
+                [
+                    '# Leseliste',
+                    '',
+                    '| Titel                |',
+                    '| -------------------- |',
+                    '| A Tale of Two Cities |',
+                    '| Don Quixote          |',
+                    '| The Art of War       |',
+                    '| Ulysses              |',
                     '',
                 ]
             ),
