@@ -50,7 +50,7 @@ final class GenerateSwimReports implements Action
 
             $this->vault->save(
                 new Note(
-                    sprintf('Notes/Schwimmen (%s).md', $year),
+                    sprintf('Hobbies/Exercise/Swimming/Schwimmen (%s).md', $year),
                     $frontMatter,
                     $this->contentForYear($year, $items->filterDate((string)$year))
                 )
@@ -73,7 +73,7 @@ final class GenerateSwimReports implements Action
 
         $chartItems = $items->onlyWithTime();
         if ($chartItems->count() > 0) {
-            $chartFilename = 'Notes/attachments/Schwimmen.generated.png';
+            $chartFilename = 'Hobbies/Exercise/Swimming/attachments/Schwimmen.generated.png';
             $chartContent  = $this->averageTimeChartGenerator->generate($chartItems);
 
             $this->vault->save(new Asset($chartFilename, $chartContent));
@@ -83,7 +83,7 @@ final class GenerateSwimReports implements Action
             $content .= sprintf('![[%s]]', $chartFilename);
         }
 
-        $this->vault->save(new Note('Notes/Schwimmen.md', ['tags' => ['generated']], $content));
+        $this->vault->save(new Note('Hobbies/Exercise/Swimming/Schwimmen.md', ['tags' => ['generated']], $content));
     }
 
     private function swimItems(): SwimItems
@@ -148,7 +148,7 @@ final class GenerateSwimReports implements Action
 
         $chartItems = $items->filterDate((string)$year)->onlyWithTime();
         if ($chartItems->count() > 0) {
-            $chartFilename = sprintf('Notes/attachments/Schwimmen-%s.generated.png', $year);
+            $chartFilename = sprintf('Hobbies/Exercise/Swimming/attachments/Schwimmen-%s.generated.png', $year);
             $chartContent  = $this->averageTimeChartGenerator->generate($chartItems);
 
             $this->vault->save(new Asset($chartFilename, $chartContent));

@@ -63,7 +63,13 @@ final class GenerateReadingList implements Action
      */
     private function bookNotes(): iterable
     {
-        $query = Query::create()->withLocation('Notes/Quellen/Bücher');
+        $query = Query::create()->withLocation('Sources/Books - Fiction');
+
+        foreach ($this->vault->notesMatching($query) as $matchingNote) {
+            yield $matchingNote->note->name;
+        }
+
+        $query = Query::create()->withLocation('Sources/Books - Non Fiction');
 
         foreach ($this->vault->notesMatching($query) as $matchingNote) {
             yield $matchingNote->note->name;

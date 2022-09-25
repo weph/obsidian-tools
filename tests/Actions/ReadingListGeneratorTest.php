@@ -95,9 +95,10 @@ final class ReadingListGeneratorTest extends TestCase
      */
     public function it_should_include_book_notes(): void
     {
-        $this->vault->save(new Note('Notes/Quellen/Bücher/Test-Driven Development by Example.md', [], ''));
-        $this->vault->save(new Note('Notes/Quellen/Bücher/Deep Work.md', [], ''));
-        $this->vault->save(new Note('Notes/Quellen/Bücher/BDD in Action.md', [], ''));
+        $this->vault->save(new Note('Sources/Books - Non Fiction/Test-Driven Development by Example.md', [], ''));
+        $this->vault->save(new Note('Sources/Books - Non Fiction/Deep Work.md', [], ''));
+        $this->vault->save(new Note('Sources/Books - Non Fiction/BDD in Action.md', [], ''));
+        $this->vault->save(new Note('Sources/Books - Fiction/Shining.md', [], ''));
 
         (new GenerateReadingList($this->vault))->run();
 
@@ -114,6 +115,7 @@ final class ReadingListGeneratorTest extends TestCase
                     '| -------------------------------------- |',
                     '| [[BDD in Action]]                      |',
                     '| [[Deep Work]]                          |',
+                    '| [[Shining]]                            |',
                     '| [[Test-Driven Development by Example]] |',
                     '',
                 ]
