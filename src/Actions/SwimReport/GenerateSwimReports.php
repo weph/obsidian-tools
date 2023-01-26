@@ -171,7 +171,7 @@ final class GenerateSwimReports implements Action
 
     private function monthName(int $month): string
     {
-        $date = DateTimeImmutable::createFromFormat('n', (string)$month);
+        $date = DateTimeImmutable::createFromFormat('n-j', sprintf('%d-1', $month));
         assert($date instanceof DateTimeImmutable);
 
         return $date->format('F');
