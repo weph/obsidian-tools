@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace Weph\ObsidianTools\DailyNotes;
 
-use DateTimeImmutable;
 use Weph\ObsidianTools\Vault\Query;
 use Weph\ObsidianTools\Vault\Vault;
 
@@ -29,20 +28,20 @@ final class DailyNotes
      */
     private array $calendarWeeks = [];
 
-    public function __construct(private readonly Vault $vault)
+    public function __construct(Vault $vault)
     {
         $query = Query::create()
             ->withLocation('|Daily Notes|')
             ->withFilename('|\d{4}-\d{2}-\d{2}.md|');
 
-        $matches = $this->vault->notesMatching($query);
+        $matches = $vault->notesMatching($query);
 
         $notes         = [];
         $months        = [];
         $years         = [];
         $calendarWeeks = [];
         foreach ($matches as $match) {
-            $date      = new DateTimeImmutable($match->note->name);
+            $date      = new \DateTimeImmutable($match->note->name);
             $dailyNote = new DailyNote($date, $match->note);
 
             $notes[$date->format('Y-m-d')] = $dailyNote;

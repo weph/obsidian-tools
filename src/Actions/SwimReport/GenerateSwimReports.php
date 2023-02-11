@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace Weph\ObsidianTools\Actions\SwimReport;
 
-use DateTimeImmutable;
 use Weph\ObsidianTools\Actions\Action;
 use Weph\ObsidianTools\Markdown\Table;
 use Weph\ObsidianTools\Type\Duration;
@@ -38,7 +37,7 @@ final class GenerateSwimReports implements Action
                 'tags'   => ['generated'],
             ];
 
-            $prev = $years[$i - 1] ?? null;
+            $prev = $i > 0 ? ($years[$i - 1] ?? null) : null;
             if ($prev !== null) {
                 $frontMatter['prev'] = sprintf('[[Schwimmen (%s)]]', $prev);
             }
@@ -171,8 +170,8 @@ final class GenerateSwimReports implements Action
 
     private function monthName(int $month): string
     {
-        $date = DateTimeImmutable::createFromFormat('n-j', sprintf('%d-1', $month));
-        assert($date instanceof DateTimeImmutable);
+        $date = \DateTimeImmutable::createFromFormat('n-j', sprintf('%d-1', $month));
+        assert($date instanceof \DateTimeImmutable);
 
         return $date->format('F');
     }

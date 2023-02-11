@@ -3,8 +3,7 @@ declare(strict_types=1);
 
 namespace Weph\ObsidianTools\Actions;
 
-use DateTimeImmutable;
-use IntlDateFormatter;
+use Webmozart\Assert\Assert;
 use Weph\ObsidianTools\DailyNotes\DailyNotes;
 use Weph\ObsidianTools\Vault\Note;
 use Weph\ObsidianTools\Vault\Vault;
@@ -31,7 +30,7 @@ final class GenerateJournalSummaries implements Action
 
     private function createJournalSummary(): void
     {
-        $formatter = new IntlDateFormatter('de_DE.UTF-8', IntlDateFormatter::NONE, IntlDateFormatter::NONE);
+        $formatter = new \IntlDateFormatter('de_DE.UTF-8', \IntlDateFormatter::NONE, \IntlDateFormatter::NONE);
         $formatter->setPattern('MMMM');
 
         $years = $this->dailyNotes->years();
@@ -43,11 +42,11 @@ final class GenerateJournalSummaries implements Action
             $content .= implode(
                 " / \n",
                 array_map(
-                    static fn (int $month) => sprintf(
+                    fn (int $month) => sprintf(
                         '[[%04d-%02d|%s]]',
                         $year,
                         $month,
-                        $formatter->format(DateTimeImmutable::createFromFormat('Ymd', sprintf('%04d%02d01', $year, $month)))
+                        $formatter->format($this->firstDayOfMonth($year, $month))
                     ),
                     $this->dailyNotes->months($year)
                 )
@@ -60,11 +59,20 @@ final class GenerateJournalSummaries implements Action
         $this->vault->save($note);
     }
 
+    private function firstDayOfMonth(int $year, int $month): \DateTimeImmutable
+    {
+        $date = \DateTimeImmutable::createFromFormat('Ymd', sprintf('%04d%02d01', $year, $month));
+
+        Assert::isInstanceOf($date, \DateTimeImmutable::class);
+
+        return $date;
+    }
+
     private function createMonthlySummary(int $year, int $month): void
     {
-        $formatter = new IntlDateFormatter('de_DE.UTF-8', IntlDateFormatter::NONE, IntlDateFormatter::NONE);
+        $formatter = new \IntlDateFormatter('de_DE.UTF-8', \IntlDateFormatter::NONE, \IntlDateFormatter::NONE);
         $formatter->setPattern('MMMM yyyy');
-        $title = $formatter->format(DateTimeImmutable::createFromFormat('Ymd', sprintf('%04d%02d01', $year, $month)));
+        $title = $formatter->format($this->firstDayOfMonth($year, $month));
 
         $frontMatter = [
             'parent' => '[[Journal]]',

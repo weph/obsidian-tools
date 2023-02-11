@@ -24,7 +24,7 @@ final class DurationTest extends TestCase
     /**
      * @return iterable<array-key, array{0: string}>
      */
-    public function validStrings(): iterable
+    public static function validStrings(): iterable
     {
         yield ['00:00'];
         yield ['00:01'];
@@ -46,7 +46,7 @@ final class DurationTest extends TestCase
     /**
      * @return iterable<array-key, array{0: int, 1: string}>
      */
-    public function validSeconds(): iterable
+    public static function validSeconds(): iterable
     {
         yield [0, '00:00'];
         yield [1, '00:01'];

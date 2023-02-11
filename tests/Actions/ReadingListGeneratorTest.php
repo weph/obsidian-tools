@@ -63,6 +63,9 @@ final class ReadingListGeneratorTest extends TestCase
         );
     }
 
+    /**
+     * @test
+     */
     public function it_should_link_to_the_corresponding_note(): void
     {
         $this->vault->save(new Note('a.md', [], '- Started reading [[BDD in Action]] #book/started'));

@@ -11,7 +11,7 @@ use Weph\ObsidianTools\Vault\NoteNotFound;
 use Weph\ObsidianTools\Vault\Query;
 use Weph\ObsidianTools\Vault\Vault;
 
-abstract class VaultTest extends TestCase
+abstract class VaultTestCase extends TestCase
 {
     /**
      * @test
@@ -107,7 +107,7 @@ abstract class VaultTest extends TestCase
     /**
      * @return iterable<string, array{0: list<Note>, 1: Query, 2: list<MatchedNote>}>
      */
-    public function locationQueryExamples(): iterable
+    public static function locationQueryExamples(): iterable
     {
         $rootNote   = new Note('note.md', [], '');
         $fooNote1   = new Note('foo/note.md', [], '');
@@ -155,7 +155,7 @@ abstract class VaultTest extends TestCase
     /**
      * @return iterable<string, array{0: list<Note>, 1: Query, 2: list<MatchedNote>}>
      */
-    public function filenameQueryExamples(): iterable
+    public static function filenameQueryExamples(): iterable
     {
         $foo       = new Note('foo.md', [], '');
         $foobar    = new Note('foobar.md', [], '');
@@ -185,7 +185,7 @@ abstract class VaultTest extends TestCase
     /**
      * @return iterable<string, array{0: list<Note|Asset>, 1: Query, 2: list<MatchedNote>}>
      */
-    public function matchingExamples(): iterable
+    public static function matchingExamples(): iterable
     {
         $note1 = new Note('note1.md', [], 'foo:foo bar:foo');
         $note2 = new Note('note2.md', [], 'foo:bar bar:bar');

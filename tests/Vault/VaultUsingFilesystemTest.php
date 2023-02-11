@@ -16,7 +16,7 @@ use Weph\ObsidianTools\Vault\VaultUsingFilesystem;
  * @uses   \Weph\ObsidianTools\Vault\MatchedNote
  * @uses   \Weph\ObsidianTools\Vault\Query
  */
-final class VaultUsingFilesystemTest extends VaultTest
+final class VaultUsingFilesystemTest extends VaultTestCase
 {
     private VaultUsingFilesystem $subject;
 
