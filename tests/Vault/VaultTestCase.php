@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace Tests\Weph\ObsidianTools\Vault;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Weph\ObsidianTools\Vault\Asset;
 use Weph\ObsidianTools\Vault\MatchedNote;
@@ -13,17 +15,13 @@ use Weph\ObsidianTools\Vault\Vault;
 
 abstract class VaultTestCase extends TestCase
 {
-    /**
-     * @test
-     */
+    #[Test]
     public function a_new_vault_should_be_empty(): void
     {
         self::assertEquals([], $this->subject()->all());
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function loading_a_non_existing_note_should_result_in_not_found_exception(): void
     {
         $this->expectExceptionObject(NoteNotFound::atLocation('invalid/note'));
@@ -31,9 +29,7 @@ abstract class VaultTestCase extends TestCase
         $this->subject()->get('invalid/note');
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_returns_a_saved_note(): void
     {
         $note = new Note('my-note.md', ['tags' => ['a', 'b', 'c']], '# My Note');
@@ -43,9 +39,7 @@ abstract class VaultTestCase extends TestCase
         self::assertEquals($note, $this->subject()->get('my-note.md'));
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function a_note_can_be_stored_in_a_nested_structure(): void
     {
         $note = new Note('path/to/my-note.md', ['tags' => ['a', 'b', 'c']], '# My Note');
@@ -55,9 +49,7 @@ abstract class VaultTestCase extends TestCase
         self::assertEquals($note, $this->subject()->get('path/to/my-note.md'));
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function save_should_overwrite_existing_note(): void
     {
         $location     = 'my-note.md';
@@ -70,9 +62,7 @@ abstract class VaultTestCase extends TestCase
         self::assertEquals($updatedNote, $this->subject()->get($location));
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_returns_all_saved_notes_and_assets(): void
     {
         $note1  = new Note('my-note1.md', ['tags' => ['a']], '# My Note 1');
@@ -88,13 +78,11 @@ abstract class VaultTestCase extends TestCase
     /**
      * @param list<Note|Asset>  $notes
      * @param list<MatchedNote> $expected
-     *
-     * @test
-     *
-     * @dataProvider locationQueryExamples
-     * @dataProvider filenameQueryExamples
-     * @dataProvider matchingExamples
      */
+    #[DataProvider('locationQueryExamples')]
+    #[DataProvider('filenameQueryExamples')]
+    #[DataProvider('matchingExamples')]
+    #[Test]
     public function it_should_return_matching_notes(array $notes, Query $query, array $expected): void
     {
         $this->saveAll(...$notes);
@@ -246,9 +234,7 @@ abstract class VaultTestCase extends TestCase
         ];
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function subsequent_queries_should_return_the_expected_results(): void
     {
         $rootNote = new Note('note.md', [], '');

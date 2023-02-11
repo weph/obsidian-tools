@@ -8,16 +8,10 @@ use Weph\ObsidianTools\Type\Duration;
 final class SwimItems
 {
     /**
-     * @var list<SwimItem>
-     */
-    private array $items;
-
-    /**
      * @param list<SwimItem> $items
      */
-    private function __construct(array $items)
+    private function __construct(private array $items)
     {
-        $this->items = $items;
     }
 
     public static function empty(): self

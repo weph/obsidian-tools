@@ -5,7 +5,6 @@ namespace Weph\ObsidianTools\Actions\SwimReport;
 
 use Amenadiel\JpGraph\Graph\Graph;
 use Amenadiel\JpGraph\Plot\LinePlot;
-use RuntimeException;
 use Weph\ObsidianTools\Type\Duration;
 
 final class AverageTimeChartGenerator
@@ -16,7 +15,7 @@ final class AverageTimeChartGenerator
     public function generate(SwimItems $items): string
     {
         if ($items->count() === 0) {
-            throw new RuntimeException('Can not generate chart without data');
+            throw new \RuntimeException('Can not generate chart without data');
         }
 
         $x = [];

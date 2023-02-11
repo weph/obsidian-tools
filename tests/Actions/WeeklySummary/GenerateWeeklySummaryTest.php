@@ -4,24 +4,31 @@ declare(strict_types=1);
 namespace Tests\Weph\ObsidianTools\Actions\WeeklySummary;
 
 use org\bovigo\vfs\vfsStream;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Test;
+use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
 use Weph\ObsidianTools\Actions\WeeklySummary\GenerateWeeklySummary;
+use Weph\ObsidianTools\Actions\WeeklySummary\HabitTracker;
+use Weph\ObsidianTools\DailyNotes\CalendarWeekNotes;
+use Weph\ObsidianTools\DailyNotes\DailyNote;
+use Weph\ObsidianTools\DailyNotes\DailyNotes;
+use Weph\ObsidianTools\Markdown\Table;
+use Weph\ObsidianTools\Vault\MatchedNote;
 use Weph\ObsidianTools\Vault\Note;
+use Weph\ObsidianTools\Vault\Query;
 use Weph\ObsidianTools\Vault\VaultUsingFilesystem;
 
-/**
- * @covers \Weph\ObsidianTools\Actions\WeeklySummary\GenerateWeeklySummary
- *
- * @uses   \Weph\ObsidianTools\Markdown\Table
- * @uses   \Weph\ObsidianTools\DailyNotes\CalendarWeekNotes
- * @uses   \Weph\ObsidianTools\DailyNotes\DailyNote
- * @uses   \Weph\ObsidianTools\DailyNotes\DailyNotes
- * @uses   \Weph\ObsidianTools\Vault\MatchedNote
- * @uses   \Weph\ObsidianTools\Vault\Note
- * @uses   \Weph\ObsidianTools\Vault\Query
- * @uses   \Weph\ObsidianTools\Vault\VaultUsingFilesystem
- * @uses   \Weph\ObsidianTools\Actions\WeeklySummary\HabitTracker
- */
+#[CoversClass(GenerateWeeklySummary::class)]
+#[UsesClass(Table::class)]
+#[UsesClass(CalendarWeekNotes::class)]
+#[UsesClass(DailyNote::class)]
+#[UsesClass(DailyNotes::class)]
+#[UsesClass(MatchedNote::class)]
+#[UsesClass(Note::class)]
+#[UsesClass(Query::class)]
+#[UsesClass(VaultUsingFilesystem::class)]
+#[UsesClass(HabitTracker::class)]
 final class GenerateWeeklySummaryTest extends TestCase
 {
     private VaultUsingFilesystem $vault;
@@ -35,9 +42,7 @@ final class GenerateWeeklySummaryTest extends TestCase
         $this->vault = VaultUsingFilesystem::atPath($root->url());
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_should_embed_every_daily_note_per_calendar_week(): void
     {
         $this->vault->save(new Note('Notes/Daily Notes/2022-01-01.md', [], ''));
@@ -117,9 +122,7 @@ final class GenerateWeeklySummaryTest extends TestCase
         );
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_should_link_to_the_previous_and_next_calendar_week(): void
     {
         $this->vault->save(new Note('Notes/Daily Notes/2022-05-01.md', [], ''));
@@ -142,9 +145,7 @@ final class GenerateWeeklySummaryTest extends TestCase
         self::assertNoteDoesNotHaveFrontmatterField('next', $this->vault->get('Notes/Daily Notes/2022/2022-W26.md'));
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_should_include_a_habit_tracker(): void
     {
         $this->vault->save(new Note('Notes/Daily Notes/2022-05-02.md', [], '- #track/a'));

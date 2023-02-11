@@ -5,22 +5,27 @@ namespace Tests\Weph\ObsidianTools\Actions;
 
 use org\bovigo\vfs\vfsStream;
 use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Test;
+use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
 use Weph\ObsidianTools\Actions\UpdateBreadcrumbs;
+use Weph\ObsidianTools\DailyNotes\CalendarWeekNotes;
+use Weph\ObsidianTools\DailyNotes\DailyNote;
+use Weph\ObsidianTools\DailyNotes\DailyNotes;
+use Weph\ObsidianTools\Vault\MatchedNote;
 use Weph\ObsidianTools\Vault\Note;
+use Weph\ObsidianTools\Vault\Query;
 use Weph\ObsidianTools\Vault\VaultUsingFilesystem;
 
-/**
- * @covers \Weph\ObsidianTools\Actions\UpdateBreadcrumbs
- *
- * @uses   \Weph\ObsidianTools\DailyNotes\CalendarWeekNotes
- * @uses   \Weph\ObsidianTools\DailyNotes\DailyNote
- * @uses   \Weph\ObsidianTools\DailyNotes\DailyNotes
- * @uses   \Weph\ObsidianTools\Vault\MatchedNote
- * @uses   \Weph\ObsidianTools\Vault\Note
- * @uses   \Weph\ObsidianTools\Vault\Query
- * @uses   \Weph\ObsidianTools\Vault\VaultUsingFilesystem
- */
+#[CoversClass(UpdateBreadcrumbs::class)]
+#[UsesClass(CalendarWeekNotes::class)]
+#[UsesClass(DailyNote::class)]
+#[UsesClass(DailyNotes::class)]
+#[UsesClass(MatchedNote::class)]
+#[UsesClass(Note::class)]
+#[UsesClass(Query::class)]
+#[UsesClass(VaultUsingFilesystem::class)]
 final class UpdateBreadcrumbsTest extends TestCase
 {
     private VaultUsingFilesystem $vault;
@@ -34,9 +39,7 @@ final class UpdateBreadcrumbsTest extends TestCase
         $this->vault = VaultUsingFilesystem::atPath($root->url());
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_should_set_breadcrumbs_frontmatter_on_daily_notes(): void
     {
         $this->vault->save(new Note('Notes/Daily Notes/2022-01-01.md', [], ''));

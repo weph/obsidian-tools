@@ -4,24 +4,27 @@ declare(strict_types=1);
 namespace Tests\Weph\ObsidianTools\Actions;
 
 use org\bovigo\vfs\vfsStream;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Test;
+use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
 use Weph\ObsidianTools\Actions\GenerateJournalSummaries;
+use Weph\ObsidianTools\DailyNotes\CalendarWeekNotes;
+use Weph\ObsidianTools\DailyNotes\DailyNote;
+use Weph\ObsidianTools\DailyNotes\DailyNotes;
 use Weph\ObsidianTools\Vault\MatchedNote;
 use Weph\ObsidianTools\Vault\Note;
 use Weph\ObsidianTools\Vault\Query;
 use Weph\ObsidianTools\Vault\VaultUsingFilesystem;
 
-/**
- * @covers \Weph\ObsidianTools\Actions\GenerateJournalSummaries
- *
- * @uses   \Weph\ObsidianTools\DailyNotes\CalendarWeekNotes
- * @uses   \Weph\ObsidianTools\DailyNotes\DailyNote
- * @uses   \Weph\ObsidianTools\DailyNotes\DailyNotes
- * @uses   \Weph\ObsidianTools\Vault\MatchedNote
- * @uses   \Weph\ObsidianTools\Vault\Note
- * @uses   \Weph\ObsidianTools\Vault\Query
- * @uses   \Weph\ObsidianTools\Vault\VaultUsingFilesystem
- */
+#[CoversClass(GenerateJournalSummaries::class)]
+#[UsesClass(CalendarWeekNotes::class)]
+#[UsesClass(DailyNote::class)]
+#[UsesClass(DailyNotes::class)]
+#[UsesClass(MatchedNote::class)]
+#[UsesClass(Note::class)]
+#[UsesClass(Query::class)]
+#[UsesClass(VaultUsingFilesystem::class)]
 final class GenerateJournalSummariesTest extends TestCase
 {
     private VaultUsingFilesystem $vault;
@@ -35,9 +38,7 @@ final class GenerateJournalSummariesTest extends TestCase
         $this->vault = VaultUsingFilesystem::atPath($root->url());
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_should_generate_an_overview_with_all_covered_years_and_months(): void
     {
         $this->vault->save(new Note('Notes/Daily Notes/2019-03-03.md', [], ''));
@@ -74,9 +75,7 @@ final class GenerateJournalSummariesTest extends TestCase
         );
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_should_create_a_monthly_overview_for_all_covered_months(): void
     {
         $this->vault->save(new Note('Notes/Daily Notes/2019-03-03.md', [], ''));
@@ -99,9 +98,7 @@ final class GenerateJournalSummariesTest extends TestCase
         );
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function the_monthly_overview_should_embed_every_daily_note_of_that_month(): void
     {
         $this->vault->save(new Note('Notes/Daily Notes/2019-01-02.md', [], ''));
@@ -133,9 +130,7 @@ final class GenerateJournalSummariesTest extends TestCase
         );
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function the_monthly_overview_should_link_to_the_previous_and_next_month(): void
     {
         $this->vault->save(new Note('Notes/Daily Notes/2019-01-02.md', [], ''));

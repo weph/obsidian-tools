@@ -23,7 +23,7 @@ final class HabitTracker
                 continue;
             }
 
-            $day = ((int)($dailyNote->date)->format('N')) - 1;
+            $day = ((int)$dailyNote->date->format('N')) - 1;
             foreach ($matches[1] as $tag) {
                 if (!isset($tags[$tag])) {
                     continue;

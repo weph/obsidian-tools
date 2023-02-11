@@ -12,9 +12,9 @@ use Weph\ObsidianTools\Vault\Vault;
 
 final class GenerateWeeklySummary implements Action
 {
-    private DailyNotes $dailyNotes;
+    private readonly DailyNotes $dailyNotes;
 
-    private HabitTracker $habitTracker;
+    private readonly HabitTracker $habitTracker;
 
     /**
      * @param array{tagLabels?: array<string, string>} $options

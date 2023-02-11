@@ -4,21 +4,25 @@ declare(strict_types=1);
 namespace Tests\Weph\ObsidianTools\Actions;
 
 use org\bovigo\vfs\vfsStream;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Test;
+use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
 use Weph\ObsidianTools\Actions\GenerateBookmarks;
+use Weph\ObsidianTools\DailyNotes\DailyNotes;
+use Weph\ObsidianTools\Markdown\Table;
+use Weph\ObsidianTools\Vault\MatchedNote;
 use Weph\ObsidianTools\Vault\Note;
+use Weph\ObsidianTools\Vault\Query;
 use Weph\ObsidianTools\Vault\VaultUsingFilesystem;
 
-/**
- * @covers \Weph\ObsidianTools\Actions\GenerateBookmarks
- *
- * @uses   \Weph\ObsidianTools\DailyNotes\DailyNotes
- * @uses   \Weph\ObsidianTools\Vault\MatchedNote
- * @uses   \Weph\ObsidianTools\Vault\Note
- * @uses   \Weph\ObsidianTools\Vault\Query
- * @uses   \Weph\ObsidianTools\Vault\VaultUsingFilesystem
- * @uses   \Weph\ObsidianTools\Markdown\Table
- */
+#[CoversClass(GenerateBookmarks::class)]
+#[UsesClass(DailyNotes::class)]
+#[UsesClass(MatchedNote::class)]
+#[UsesClass(Note::class)]
+#[UsesClass(Query::class)]
+#[UsesClass(VaultUsingFilesystem::class)]
+#[UsesClass(Table::class)]
 final class GenerateBookmarksTest extends TestCase
 {
     private VaultUsingFilesystem $vault;
@@ -32,9 +36,7 @@ final class GenerateBookmarksTest extends TestCase
         $this->vault = VaultUsingFilesystem::atPath($root->url());
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_created_a_table_of_all_bookmarks(): void
     {
         $this->vault->save(new Note('Notes/Daily Notes/2022-01-01.md', [], '- [Link 1](https://link1.test): A description #bookmark #foo'));

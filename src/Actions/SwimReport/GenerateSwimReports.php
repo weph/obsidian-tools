@@ -13,13 +13,10 @@ use Weph\ObsidianTools\Vault\Vault;
 
 final class GenerateSwimReports implements Action
 {
-    private Vault $vault;
+    private readonly AverageTimeChartGenerator $averageTimeChartGenerator;
 
-    private AverageTimeChartGenerator $averageTimeChartGenerator;
-
-    public function __construct(Vault $vault)
+    public function __construct(private readonly Vault $vault)
     {
-        $this->vault                     = $vault;
         $this->averageTimeChartGenerator = new AverageTimeChartGenerator();
     }
 

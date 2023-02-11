@@ -4,20 +4,23 @@ declare(strict_types=1);
 namespace Tests\Weph\ObsidianTools\Actions;
 
 use org\bovigo\vfs\vfsStream;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Test;
+use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
 use Weph\ObsidianTools\Actions\GenerateReadingList;
+use Weph\ObsidianTools\Markdown\Table;
+use Weph\ObsidianTools\Vault\MatchedNote;
 use Weph\ObsidianTools\Vault\Note;
+use Weph\ObsidianTools\Vault\Query;
 use Weph\ObsidianTools\Vault\VaultUsingFilesystem;
 
-/**
- * @covers \Weph\ObsidianTools\Actions\GenerateReadingList
- *
- * @uses   \Weph\ObsidianTools\Markdown\Table
- * @uses   \Weph\ObsidianTools\Vault\MatchedNote
- * @uses   \Weph\ObsidianTools\Vault\Note
- * @uses   \Weph\ObsidianTools\Vault\Query
- * @uses   \Weph\ObsidianTools\Vault\VaultUsingFilesystem
- */
+#[CoversClass(GenerateReadingList::class)]
+#[UsesClass(Table::class)]
+#[UsesClass(MatchedNote::class)]
+#[UsesClass(Note::class)]
+#[UsesClass(Query::class)]
+#[UsesClass(VaultUsingFilesystem::class)]
 final class ReadingListGeneratorTest extends TestCase
 {
     private VaultUsingFilesystem $vault;
@@ -31,9 +34,7 @@ final class ReadingListGeneratorTest extends TestCase
         $this->vault = VaultUsingFilesystem::atPath($root->url());
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_should_build_a_table_of_all_book_the_have_been_started_or_finished(): void
     {
         $this->vault->save(new Note('a.md', [], '- Started reading "BDD in Action" #book/started'));
@@ -63,9 +64,7 @@ final class ReadingListGeneratorTest extends TestCase
         );
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_should_link_to_the_corresponding_note(): void
     {
         $this->vault->save(new Note('a.md', [], '- Started reading [[BDD in Action]] #book/started'));
@@ -93,9 +92,7 @@ final class ReadingListGeneratorTest extends TestCase
         );
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_should_include_book_notes(): void
     {
         $this->vault->save(new Note('Sources/Books - Non Fiction/Test-Driven Development by Example.md', [], ''));
@@ -127,9 +124,7 @@ final class ReadingListGeneratorTest extends TestCase
         );
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function books_should_be_ordered_alphabetically(): void
     {
         $this->vault->save(new Note('a.md', [], '- "The Art of War" #book/started'));

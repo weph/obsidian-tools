@@ -11,6 +11,20 @@
         "enabled": true,
         "actions": [
             {
+                "action": "./vendor/bin/rector process --dry-run {$STAGED_FILES|of-type:php}",
+                "options": [],
+                "conditions": [
+                    {
+                        "exec": "\\CaptainHook\\App\\Hook\\Condition\\FileStaged\\Any",
+                        "args": [
+                            [
+                                "*.php"
+                            ]
+                        ]
+                    }
+                ]
+            },
+            {
                 "action": "./vendor/bin/php-cs-fixer --config=.php-cs-fixer.dist.php fix {$STAGED_FILES|of-type:php}",
                 "options": [],
                 "conditions": [

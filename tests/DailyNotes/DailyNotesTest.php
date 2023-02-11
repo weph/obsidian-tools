@@ -3,26 +3,28 @@ declare(strict_types=1);
 
 namespace Tests\Weph\ObsidianTools\DailyNotes;
 
-use DateTimeImmutable;
 use org\bovigo\vfs\vfsStream;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Test;
+use PHPUnit\Framework\Attributes\TestWith;
+use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
 use Weph\ObsidianTools\DailyNotes\CalendarWeekNotes;
 use Weph\ObsidianTools\DailyNotes\DailyNote;
 use Weph\ObsidianTools\DailyNotes\DailyNotes;
+use Weph\ObsidianTools\Vault\MatchedNote;
 use Weph\ObsidianTools\Vault\Note;
+use Weph\ObsidianTools\Vault\Query;
 use Weph\ObsidianTools\Vault\Vault;
 use Weph\ObsidianTools\Vault\VaultUsingFilesystem;
 
-/**
- * @covers \Weph\ObsidianTools\DailyNotes\DailyNotes
- *
- * @uses   \Weph\ObsidianTools\DailyNotes\CalendarWeekNotes
- * @uses   \Weph\ObsidianTools\DailyNotes\DailyNote
- * @uses   \Weph\ObsidianTools\Vault\Note
- * @uses   \Weph\ObsidianTools\Vault\MatchedNote
- * @uses   \Weph\ObsidianTools\Vault\VaultUsingFilesystem
- * @uses   \Weph\ObsidianTools\Vault\Query
- */
+#[CoversClass(DailyNotes::class)]
+#[UsesClass(CalendarWeekNotes::class)]
+#[UsesClass(DailyNote::class)]
+#[UsesClass(Note::class)]
+#[UsesClass(MatchedNote::class)]
+#[UsesClass(VaultUsingFilesystem::class)]
+#[UsesClass(Query::class)]
 final class DailyNotesTest extends TestCase
 {
     private Vault $vault;
@@ -36,9 +38,7 @@ final class DailyNotesTest extends TestCase
         $this->vault = VaultUsingFilesystem::atPath($root->url());
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_should_return_daily_notes_per_calendar_week(): void
     {
         $this->vault->save(new Note('Notes/Daily Notes/2022-01-01.md', [], ''));
@@ -72,9 +72,7 @@ final class DailyNotesTest extends TestCase
         );
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_should_return_a_note_by_its_date(): void
     {
         $note = new Note('Daily Notes/2020-01-01.md', [], '');
@@ -83,13 +81,11 @@ final class DailyNotesTest extends TestCase
         $result = (new DailyNotes($this->vault))->get(2020, 1, 1);
 
         self::assertInstanceOf(DailyNote::class, $result);
-        self::assertEquals(new DateTimeImmutable('2020-01-01'), $result->date);
+        self::assertEquals(new \DateTimeImmutable('2020-01-01'), $result->date);
         self::assertEquals($note, $result->note);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_should_return_null_if_there_is_no_note_for_a_date(): void
     {
         $result = (new DailyNotes($this->vault))->get(2020, 1, 1);
@@ -97,9 +93,7 @@ final class DailyNotesTest extends TestCase
         self::assertNull($result);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_should_return_a_list_of_all_years_that_have_at_least_one_note(): void
     {
         $this->vault->save(new Note('Daily Notes/2020-01-01.md', [], ''));
@@ -111,9 +105,7 @@ final class DailyNotesTest extends TestCase
         self::assertEquals([2014, 2016, 2020], $result);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_should_return_a_list_of_all_months_of_a_years_that_have_at_least_one_note(): void
     {
         $this->vault->save(new Note('Daily Notes/2020-01-01.md', [], ''));
@@ -127,9 +119,7 @@ final class DailyNotesTest extends TestCase
         self::assertEquals([1, 3, 12], $result);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_should_return_a_list_of_all_days_of_a_months_years_that_have_a_note(): void
     {
         $this->vault->save(new Note('Daily Notes/2016-12-01.md', [], ''));
@@ -143,14 +133,11 @@ final class DailyNotesTest extends TestCase
         self::assertEquals([1, 10, 22], $result);
     }
 
-    /**
-     * @test
-     *
-     * @testWith [2017, 1, "2016-12"]
-     *           [2016, 12, "2016-11"]
-     *           [2016, 11, "2015-03"]
-     *           [2015, 3, null]
-     */
+    #[Test]
+    #[TestWith([2017, 1, '2016-12'])]
+    #[TestWith([2016, 12, '2016-11'])]
+    #[TestWith([2016, 11, '2015-03'])]
+    #[TestWith([2015, 3, null])]
     public function it_should_return_the_previous_month(int $year, int $month, ?string $expected): void
     {
         $this->vault->save(new Note('Daily Notes/2017-01-01.md', [], ''));
@@ -163,14 +150,12 @@ final class DailyNotesTest extends TestCase
         self::assertSame($expected, $result);
     }
 
-    /**
-     * @test
-     *
-     * @testWith [2017, 1, null]
-     *           [2016, 12, "2017-01"]
-     *           [2016, 11, "2016-12"]
-     *           [2015, 3, "2016-11"]
-     */
+    #[Test]
+    #[TestWith([2017, 1, null])]
+    #[TestWith([2016, 12, '2017-01'])]
+    #[TestWith([2016, 12, '2017-01'])]
+    #[TestWith([2016, 11, '2016-12'])]
+    #[TestWith([2015, 3, '2016-11'])]
     public function it_should_return_the_next_month(int $year, int $month, ?string $expected): void
     {
         $this->vault->save(new Note('Daily Notes/2017-01-01.md', [], ''));
@@ -183,14 +168,11 @@ final class DailyNotesTest extends TestCase
         self::assertSame($expected, $result);
     }
 
-    /**
-     * @test
-     *
-     * @testWith [2017, 1, 1, "2016-12-31"]
-     *           [2016, 12, 31, "2016-11-02"]
-     *           [2016, 11, 2, "2016-11-01"]
-     *           [2016, 11, 1, null]
-     */
+    #[Test]
+    #[TestWith([2017, 1, 1, '2016-12-31'])]
+    #[TestWith([2016, 12, 31, '2016-11-02'])]
+    #[TestWith([2016, 11, 2, '2016-11-01'])]
+    #[TestWith([2016, 11, 1, null])]
     public function it_should_return_the_previous_day(int $year, int $month, int $day, ?string $expected): void
     {
         $this->vault->save(new Note('Daily Notes/2017-01-01.md', [], ''));
@@ -203,14 +185,11 @@ final class DailyNotesTest extends TestCase
         self::assertSame($expected, $result);
     }
 
-    /**
-     * @test
-     *
-     * @testWith [2017, 1, 1, null]
-     *           [2016, 12, 31, "2017-01-01"]
-     *           [2016, 11, 2, "2016-12-31"]
-     *           [2016, 11, 1, "2016-11-02"]
-     */
+    #[Test]
+    #[TestWith([2017, 1, 1, null])]
+    #[TestWith([2016, 12, 31, '2017-01-01'])]
+    #[TestWith([2016, 11, 2, '2016-12-31'])]
+    #[TestWith([2016, 11, 1, '2016-11-02'])]
     public function it_should_return_the_next_day(int $year, int $month, int $day, ?string $expected): void
     {
         $this->vault->save(new Note('Daily Notes/2017-01-01.md', [], ''));

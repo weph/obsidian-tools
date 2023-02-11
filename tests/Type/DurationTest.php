@@ -3,19 +3,17 @@ declare(strict_types=1);
 
 namespace Tests\Weph\ObsidianTools\Type;
 
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Weph\ObsidianTools\Type\Duration;
 
-/**
- * @covers \Weph\ObsidianTools\Type\Duration
- */
+#[CoversClass(Duration::class)]
 final class DurationTest extends TestCase
 {
-    /**
-     * @test
-     *
-     * @dataProvider validStrings
-     */
+    #[Test]
+    #[DataProvider('validStrings')]
     public function create_from_string(string $input): void
     {
         self::assertEquals($input, Duration::fromString($input)->asString());
@@ -33,11 +31,8 @@ final class DurationTest extends TestCase
         yield ['01:00:00'];
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider validSeconds
-     */
+    #[Test]
+    #[DataProvider('validSeconds')]
     public function create_from_int(int $input, string $expected): void
     {
         self::assertEquals($expected, Duration::fromSeconds($input)->asString());

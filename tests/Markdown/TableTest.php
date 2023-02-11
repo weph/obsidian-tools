@@ -3,17 +3,15 @@ declare(strict_types=1);
 
 namespace Tests\Weph\ObsidianTools\Markdown;
 
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Weph\ObsidianTools\Markdown\Table;
 
-/**
- * @covers \Weph\ObsidianTools\Markdown\Table
- */
+#[CoversClass(Table::class)]
 final class TableTest extends TestCase
 {
-    /**
-     * @test
-     */
+    #[Test]
     public function columns_should_be_stretched_to_an_equal_length(): void
     {
         $table = new Table(['Col A Long', 'Col B', 'Col C']);
@@ -29,9 +27,7 @@ final class TableTest extends TestCase
         );
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function column_width_should_be_determined_correctly_when_unicode_characters_are_present(): void
     {
         $table = new Table(['Cöl A', 'Col B']);

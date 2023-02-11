@@ -10,7 +10,7 @@ use Weph\ObsidianTools\Vault\Vault;
 
 final class GenerateJournalSummaries implements Action
 {
-    private DailyNotes $dailyNotes;
+    private readonly DailyNotes $dailyNotes;
 
     public function __construct(private readonly Vault $vault)
     {
